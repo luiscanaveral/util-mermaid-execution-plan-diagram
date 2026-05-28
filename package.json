@@ -1,0 +1,30 @@
+{
+  "name": "mermaid-pg-plan-diagram",
+  "version": "0.1.0",
+  "description": "Mermaid.js custom diagram plugin that renders PostgreSQL execution plans (EXPLAIN output) as interactive tree diagrams",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "keywords": [
+    "mermaid",
+    "postgresql",
+    "execution-plan",
+    "explain",
+    "diagram",
+    "visualization"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "python3 -m http.server 8080 -d .",
+    "build": "esbuild src/index.js --bundle --minify --outfile=dist/pg-plan-diagram.min.js --external:mermaid --format=esm"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

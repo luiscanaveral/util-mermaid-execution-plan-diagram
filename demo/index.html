@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL Execution Plan Diagram — Mermaid Plugin Demo</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text: #1e1e2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #4CAF50;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e2e;
+      --card-bg: #181825;
+      --text: #cdd6f4;
+      --muted: #6c7086;
+      --border: #313244;
+      --accent: #40a02b;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    background: var(--card-bg);
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .header p {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+  .plan-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .plan-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .plan-card-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .plan-card-header .sql {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: var(--bg);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .plan-card-body {
+    padding: 20px;
+    min-height: 100px;
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+  }
+  .plan-card-body .mermaid {
+    width: 100%;
+  }
+  .plan-card-body .mermaid svg {
+    max-width: 100%;
+  }
+  .plan-card-raw {
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    background: var(--bg);
+  }
+  .plan-card-raw summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .plan-card-raw pre {
+    margin-top: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--muted);
+  }
+  .footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+  .footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>PostgreSQL Execution Plan Diagram <span class="badge">Mermaid Plugin</span></h1>
+  <p>Visualize <code>EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT TEXT)</code> output as interactive tree diagrams</p>
+</div>
+
+<div class="container" id="examples"></div>
+
+<div class="footer">
+  Built with <a href="https://mermaid.js.org">Mermaid</a> &middot;
+  Source: <code>src/</code>
+</div>
+
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+import { pgPlanDiagram } from '../src/index.js';
+
+await mermaid.registerExternalDiagrams([pgPlanDiagram], { lazyLoad: false });
+
+mermaid.initialize({
+  theme: 'base',
+  themeVariables: {
+    background: 'transparent',
+    primaryColor: 'transparent',
+    primaryBorderColor: 'transparent',
+  },
+  securityLevel: 'loose',
+  fontFamily: '"SF Mono", "Fira Code", monospace',
+});
+
+const examples = [
+  {
+    title: 'Sequential Scan with Filter',
+    sql: 'EXPLAIN SELECT * FROM users WHERE age > 25;',
+    plan: ` Seq Scan on users  (cost=0.00..458.00 rows=101 width=244) (actual time=0.012..0.045 rows=101 loops=1)
+   Filter: (age > 25)
+   Rows Removed by Filter: 899
+ Planning Time: 0.065 ms
+ Execution Time: 0.064 ms`,
+  },
+  {
+    title: 'Sort with Sequential Scan',
+    sql: 'EXPLAIN SELECT * FROM users ORDER BY created_at DESC;',
+    plan: ` Sort  (cost=1000.45..1000.46 rows=1 width=8) (actual time=0.045..0.046 rows=1 loops=1)
+   Sort Key: created_at DESC
+   Sort Method: quicksort  Memory: 25kB
+   ->  Seq Scan on users  (cost=0.00..1000.00 rows=1 width=8) (actual time=0.012..0.013 rows=1 loops=1)
+ Planning Time: 0.065 ms
+ Execution Time: 0.064 ms`,
+  },
+  {
+    title: 'Nested Loop Join',
+    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id;',
+    plan: ` Nested Loop  (cost=0.00..350.00 rows=1000 width=128) (actual time=0.012..0.520 rows=1000 loops=1)
+   Join Filter: (u.id = o.user_id)
+   ->  Seq Scan on users u  (cost=0.00..100.00 rows=1000 width=64) (actual time=0.010..0.045 rows=1000 loops=1)
+   ->  Seq Scan on orders o  (cost=0.00..200.00 rows=2000 width=64) (actual time=0.002..0.180 rows=2000 loops=1)
+ Planning Time: 0.120 ms
+ Execution Time: 0.540 ms`,
+  },
+  {
+    title: 'Hash Join',
+    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id WHERE u.status = \'active\';',
+    plan:` Hash Join  (cost=150.00..400.00 rows=500 width=128) (actual time=0.100..0.350 rows=500 loops=1)
+   Hash Cond: (o.user_id = u.id)
+   ->  Seq Scan on orders o  (cost=0.00..200.00 rows=2000 width=64) (actual time=0.005..0.150 rows=2000 loops=1)
+   ->  Hash  (cost=100.00..100.00 rows=500 width=64) (actual time=0.080..0.080 rows=500 loops=1)
+         ->  Seq Scan on users u  (cost=0.00..100.00 rows=500 width=64) (actual time=0.010..0.040 rows=500 loops=1)
+               Filter: (status = 'active')
+               Rows Removed by Filter: 500
+ Planning Time: 0.150 ms
+ Execution Time: 0.380 ms`,
+  },
+  {
+    title: 'Index Scan with Bitmap Scan',
+    sql: 'EXPLAIN SELECT * FROM orders WHERE total > 100 AND created_at > \'2024-01-01\';',
+    plan: ` Bitmap Heap Scan on orders  (cost=12.34..250.00 rows=150 width=64) (actual time=0.050..0.200 rows=150 loops=1)
+   Recheck Cond: (total > 100)
+   Filter: (created_at > '2024-01-01')
+   Rows Removed by Filter: 30
+   Heap Fetches: 150
+   ->  Bitmap Index Scan on idx_orders_total  (cost=0.00..12.30 rows=180 width=0) (actual time=0.030..0.030 rows=180 loops=1)
+         Index Cond: (total > 100)
+ Planning Time: 0.090 ms
+ Execution Time: 0.220 ms`,
+  },
+  {
+    title: 'Aggregate with Group By',
+    sql: 'EXPLAIN SELECT status, COUNT(*) FROM users GROUP BY status;',
+    plan: ` HashAggregate  (cost=150.00..152.00 rows=5 width=12) (actual time=0.080..0.082 rows=5 loops=1)
+   Group Key: status
+   Batches: 1  Memory Usage: 40kB
+   ->  Seq Scan on users  (cost=0.00..100.00 rows=1000 width=4) (actual time=0.005..0.030 rows=1000 loops=1)
+ Planning Time: 0.070 ms
+ Execution Time: 0.095 ms`,
+  },
+  {
+    title: 'Merge Join with Index Scan',
+    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id ORDER BY u.id;',
+    plan: ` Merge Join  (cost=0.50..500.00 rows=1000 width=128) (actual time=0.020..0.480 rows=1000 loops=1)
+   Merge Cond: (u.id = o.user_id)
+   ->  Index Scan using users_pkey on users u  (cost=0.00..200.00 rows=1000 width=64) (actual time=0.010..0.100 rows=1000 loops=1)
+   ->  Index Scan using idx_orders_user_id on orders o  (cost=0.00..250.00 rows=2000 width=64) (actual time=0.005..0.150 rows=2000 loops=1)
+ Planning Time: 0.110 ms
+ Execution Time: 0.500 ms`,
+  },
+  {
+    title: 'Multi-level: Nested Loop with Index Scan and Filter (TPC-H style)',
+    sql: 'EXPLAIN SELECT * FROM customers c JOIN orders o ON c.custkey = o.custkey JOIN lineitems l ON o.orderkey = l.orderkey WHERE c.nationkey = 10;',
+    plan: ` Nested Loop  (cost=10.00..850.00 rows=500 width=256) (actual time=0.050..0.800 rows=500 loops=1)
+    Join Filter: (o.orderkey = l.orderkey)
+    ->  Nested Loop  (cost=5.00..400.00 rows=200 width=128) (actual time=0.030..0.350 rows=200 loops=1)
+          Join Filter: (c.custkey = o.custkey)
+          ->  Seq Scan on customers c  (cost=0.00..100.00 rows=50 width=64) (actual time=0.010..0.020 rows=50 loops=1)
+                Filter: (nationkey = 10)
+                Rows Removed by Filter: 950
+          ->  Seq Scan on orders o  (cost=0.00..250.00 rows=500 width=64) (actual time=0.005..0.150 rows=500 loops=1)
+    ->  Seq Scan on lineitems l  (cost=0.00..400.00 rows=1000 width=128) (actual time=0.010..0.200 rows=1000 loops=1)
+  Planning Time: 0.180 ms
+  Execution Time: 0.850 ms`,
+  },
+  {
+    title: 'Parallel Aggregate with Sort (EXPLAIN FORMAT JSON)',
+    sql: 'EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT JSON) SELECT metric_name, date_trunc(\'day\', recorded_at), AVG(value), MAX(value), MIN(value), COUNT(*) FROM metrics GROUP BY metric_name, date_trunc(\'day\', recorded_at);',
+    format: 'json',
+    plan: {"Plan":{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Finalize","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":2150146.18,"Plan Rows":10000052,"Plan Width":51,"Actual Startup Time":2624.92,"Actual Total Time":3461.001,"Actual Rows":1830,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","avg(value)","max(value)","min(value)","count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Gather Merge","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":1875144.76,"Plan Rows":8333376,"Plan Width":75,"Actual Startup Time":2624.439,"Actual Total Time":3459.345,"Actual Rows":5490,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","(PARTIAL avg(value))","(PARTIAL max(value))","(PARTIAL min(value))","(PARTIAL count(*))"],"Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Partial","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":912266.37,"Plan Rows":4166688,"Plan Width":75,"Actual Startup Time":2528.741,"Actual Total Time":3367.829,"Actual Rows":1830,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","PARTIAL avg(value)","PARTIAL max(value)","PARTIAL min(value)","PARTIAL count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Sort","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":797682.45,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":2528.527,"Actual Total Time":2965.032,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","value"],"Sort Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Sort Method":"external merge","Sort Space Used":131800,"Sort Space Type":"Disk","Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Seq Scan","Parent Relationship":"Outer","Parallel Aware":true,"Async Capable":false,"Relation Name":"metrics","Schema":"public","Alias":"metrics","Startup Cost":0.0,"Total Cost":129740.6,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":114.724,"Actual Total Time":520.531,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","date_trunc('day'::text, recorded_at)","value"],"Shared Hit Blocks":1472,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":0,"Temp Written Blocks":0}]}]}]}]},"Planning":{"Shared Hit Blocks":104,"Shared Read Blocks":0,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":0,"Temp Written Blocks":0},"Planning Time":0.335,"Triggers":[],"JIT":{"Functions":24,"Options":{"Inlining":true,"Optimization":true,"Expressions":true,"Deforming":true},"Timing":{"Generation":1.648,"Inlining":152.18,"Optimization":92.961,"Emission":98.979,"Total":345.768}},"Execution Time":3482.808},
+  },
+];
+
+const container = document.getElementById('examples');
+
+for (const ex of examples) {
+  const card = document.createElement('div');
+  card.className = 'plan-card';
+
+  const planText = ex.format === 'json' ? JSON.stringify(ex.plan) : ex.plan;
+  const rawText = ex.format === 'json' ? JSON.stringify(ex.plan, null, 2) : ex.plan;
+
+  card.innerHTML = `
+    <div class="plan-card-header">
+      <h2>${ex.title}</h2>
+      <code class="sql">${ex.sql}</code>
+    </div>
+    <div class="plan-card-body">
+      <div class="mermaid">pg-plan
+${planText}</div>
+    </div>
+    <details class="plan-card-raw">
+      <summary>View raw EXPLAIN output</summary>
+      <pre>${rawText}</pre>
+    </details>
+  `;
+
+  container.appendChild(card);
+}
+
+// Render all mermaid diagrams
+await mermaid.run({ querySelector: '.mermaid' });
+</script>
+</body>
+</html>
