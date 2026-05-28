@@ -227,8 +227,8 @@ export function parseExplainPlan(text) {
       }
 
       node.properties = [];
-      for (let j = i + 1; j < rawLines.length; j++) {
-        const nextLine = rawLines[j];
+      for (let j = i + 1; j < lines.length; j++) {
+        const nextLine = lines[j];
         const nextTrimmed = nextLine.trim();
         if (!nextTrimmed) break;
         if (nextLine.includes('-> ')) break;

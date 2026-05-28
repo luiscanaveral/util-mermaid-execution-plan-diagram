@@ -13,6 +13,26 @@ const TREE_PAD = 30;
 const CORNER_R = 6;
 
 const FONT_FAMILY = "'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace";
+const CHARS_PER_LINE = Math.floor((NODE_W - 2 * PAD) / 7.2); // ~55 at 12px monospace
+
+function wrapText(text) {
+  if (text.length <= CHARS_PER_LINE) return [text];
+  const lines = [];
+  let remaining = text;
+  while (remaining.length > 0) {
+    if (remaining.length <= CHARS_PER_LINE) {
+      lines.push(remaining);
+      break;
+    }
+    let cut = remaining.lastIndexOf(', ', CHARS_PER_LINE);
+    if (cut < 10) cut = remaining.lastIndexOf(' ', CHARS_PER_LINE);
+    if (cut < 10) cut = CHARS_PER_LINE;
+    lines.push(remaining.substring(0, cut));
+    const skip = remaining[cut] === ',' ? 2 : 1;
+    remaining = remaining.substring(cut + skip).trimStart();
+  }
+  return lines;
+}
 
 function getColor(type, isDark) {
   const palette = isDark ? NODE_COLORS_DARK : NODE_COLORS;
@@ -30,7 +50,10 @@ function getNodeHeight(node) {
   if (node.relation) h += LINE_H;
   h += LINE_H;
   if (node.hasActuals) h += LINE_H;
-  h += node.properties.length * LINE_H;
+  for (const prop of node.properties) {
+    const text = (prop.key ? prop.key + ': ' : '') + prop.value;
+    h += wrapText(text).length * LINE_H;
+  }
   h += PAD;
   return h;
 }
@@ -252,27 +275,35 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
 
   // Properties
   for (const prop of node.properties) {
-    const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    pText.setAttribute('x', x + PAD);
-    pText.setAttribute('y', ly + LINE_H / 2);
-    pText.setAttribute('fill', mutedColor);
-    pText.setAttribute('font-family', FONT_FAMILY);
-    pText.setAttribute('font-size', '12');
-    pText.setAttribute('dominant-baseline', 'middle');
+    const prefix = prop.key ? prop.key + ': ' : '';
+    const fullText = prefix + prop.value;
+    const lines = wrapText(fullText);
 
-    if (prop.key) {
-      const keySpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      keySpan.setAttribute('fill', mutedColor);
-      keySpan.setAttribute('font-weight', '500');
-      keySpan.textContent = prop.key + ': ';
-      pText.appendChild(keySpan);
+    for (let li = 0; li < lines.length; li++) {
+      const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      pText.setAttribute('x', x + PAD);
+      pText.setAttribute('y', ly + LINE_H / 2);
+      pText.setAttribute('fill', mutedColor);
+      pText.setAttribute('font-family', FONT_FAMILY);
+      pText.setAttribute('font-size', '12');
+      pText.setAttribute('dominant-baseline', 'middle');
+
+      if (li === 0 && prop.key) {
+        const keySpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        keySpan.setAttribute('fill', mutedColor);
+        keySpan.setAttribute('font-weight', '500');
+        keySpan.textContent = prefix;
+        pText.appendChild(keySpan);
+      }
+      const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      valSpan.setAttribute('fill', textColor);
+      valSpan.textContent = li === 0 && prop.key
+        ? lines[0].substring(prefix.length)
+        : lines[li];
+      pText.appendChild(valSpan);
+      g.appendChild(pText);
+      ly += LINE_H;
     }
-    const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    valSpan.setAttribute('fill', textColor);
-    valSpan.textContent = prop.value;
-    pText.appendChild(valSpan);
-    g.appendChild(pText);
-    ly += LINE_H;
   }
 }
 
@@ -349,8 +380,9 @@ export function renderPlan(planData, svgId, isDark) {
   maxH += TREE_PAD;
 
   // Draw connectors (from bottom-center of parent to top-center of child)
-  for (let i = 1; i < layout.length; i++) {
+  for (let i = 0; i < layout.length; i++) {
     const child = layout[i];
+    if (child.node.depth === 0) continue;
     const parent = findParentLayout(layout, child);
     if (parent) {
       const px = parent.x + parent.w / 2;
@@ -381,11 +413,10 @@ export function renderPlan(planData, svgId, isDark) {
 }
 
 function findParentLayout(layout, child) {
-  for (let i = layout.indexOf(child) - 1; i >= 0; i--) {
+  const start = layout.indexOf(child);
+  for (let i = start + 1; i < layout.length; i++) {
     const p = layout[i];
-    const childDepth = child.node.depth;
-    const pDepth = p.node.depth;
-    if (pDepth < childDepth) {
+    if (p.node.depth < child.node.depth) {
       return p;
     }
   }
