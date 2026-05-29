@@ -14,7 +14,7 @@ export const NODE_COLORS_DARK = {
   other: '#6c7086',
 };
 
-export function getStyles() {
+export function getStyles(options = {}) {
   return `
     .plan-node { transition: opacity 0.2s; }
     .plan-node:hover { opacity: 0.85; }

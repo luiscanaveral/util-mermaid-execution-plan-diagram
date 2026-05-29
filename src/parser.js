@@ -170,11 +170,13 @@ function flattenTree(node) {
 
 export function parseExplainPlanJSON(text) {
   const data = JSON.parse(text);
+  // PostgreSQL FORMAT JSON returns [{"Plan": {...}}] — unwrap the array
+  const obj = Array.isArray(data) ? data[0] : data;
   const meta = {
-    planningTime: data['Planning Time'] ?? null,
-    executionTime: data['Execution Time'] ?? null,
+    planningTime: obj['Planning Time'] ?? null,
+    executionTime: obj['Execution Time'] ?? null,
   };
-  const root = convertJSONNode(data['Plan'], 0);
+  const root = convertJSONNode(obj['Plan'], 0);
   return { root, nodes: flattenTree(root), meta };
 }
 

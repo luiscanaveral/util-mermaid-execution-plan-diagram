@@ -376,22 +376,29 @@ export function renderPlan(planData, svgId, isDark) {
     if (right > maxW) maxW = right;
     if (bottom > maxH) maxH = bottom;
   }
+  const origMaxBottom = maxH;
   maxW += TREE_PAD;
   maxH += TREE_PAD;
 
-  // Draw connectors (from bottom-center of parent to top-center of child)
+  // Flip Y so leaves are at top and root at bottom (data-flow direction)
+  for (const item of layout) {
+    item.y = origMaxBottom - item.y - item.h + startY;
+  }
+
+  // Draw connectors (from top-center of parent to bottom-center of child)
   for (let i = 0; i < layout.length; i++) {
     const child = layout[i];
     if (child.node.depth === 0) continue;
     const parent = findParentLayout(layout, child);
     if (parent) {
       const px = parent.x + parent.w / 2;
-      const py = parent.y + parent.h;
+      const py = parent.y;                           // parent TOP edge
       const cx = child.x + child.w / 2;
-      const cy = child.y;
-      renderConnector(svg, px, py, px, cy - 10, isDark);
-      renderConnector(svg, px, cy - 10, cx, cy - 10, isDark);
-      renderConnector(svg, cx, cy - 10, cx, cy, isDark);
+      const cy = child.y + child.h;                  // child BOTTOM edge
+      const turnY = cy + 10;
+      renderConnector(svg, px, py, px, turnY, isDark);
+      renderConnector(svg, px, turnY, cx, turnY, isDark);
+      renderConnector(svg, cx, turnY, cx, cy, isDark);
     }
   }
 

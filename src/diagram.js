@@ -29,9 +29,13 @@ const parser = {
   parse(text) {
     let working = text;
     const lines = working.split('\n');
-    if (lines.length > 0 && DIAGRAM_PREFIX.test(lines[0].trim())) {
-      working = lines.slice(1).join('\n');
-    }
+    // Strip pg-plan prefix
+    const content = (lines.length > 0 && DIAGRAM_PREFIX.test(lines[0].trim()))
+      ? lines.slice(1)
+      : lines;
+    // Filter Mermaid comment lines (%%...)
+    const filtered = content.filter(l => !/^\s*%%/.test(l));
+    working = filtered.join('\n');
     const trimmed = working.trim();
     const parsed = trimmed.startsWith('{')
       ? parseExplainPlanJSON(trimmed)
