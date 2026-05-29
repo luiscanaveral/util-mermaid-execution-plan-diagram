@@ -157,6 +157,7 @@ mermaid.initialize({
 });
 
 const examples = [
+  // ── Existing examples ──
   {
     title: 'Finalize GroupAggregate (TEXT)',
     sql: 'EXPLAIN (ANALYZE, COSTS, BUFFERS) SELECT metric_name, date_trunc(\'day\', recorded_at), AVG(value), MAX(value), MIN(value), COUNT(*) FROM metrics GROUP BY metric_name, date_trunc(\'day\', recorded_at);',
@@ -188,97 +189,313 @@ const examples = [
     title: 'Parallel Aggregate with Sort (EXPLAIN FORMAT JSON)',
     sql: 'EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT JSON) SELECT metric_name, date_trunc(\'day\', recorded_at), AVG(value), MAX(value), MIN(value), COUNT(*) FROM metrics GROUP BY metric_name, date_trunc(\'day\', recorded_at);',
     format: 'json',
-    plan: {"Plan":{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Finalize","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":2150146.18,"Plan Rows":10000052,"Plan Width":51,"Actual Startup Time":2624.92,"Actual Total Time":3461.001,"Actual Rows":1830,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","avg(value)","max(value)","min(value)","count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Gather Merge","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":1875144.76,"Plan Rows":8333376,"Plan Width":75,"Actual Startup Time":2624.439,"Actual Total Time":3459.345,"Actual Rows":5490,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","(PARTIAL avg(value))","(PARTIAL max(value))","(PARTIAL min(value))","(PARTIAL count(*))"],"Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Partial","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":912266.37,"Plan Rows":4166688,"Plan Width":75,"Actual Startup Time":2528.741,"Actual Total Time":3367.829,"Actual Rows":1830,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","PARTIAL avg(value)","PARTIAL max(value)","PARTIAL min(value)","PARTIAL count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Sort","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":797682.45,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":2528.527,"Actual Total Time":2965.032,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","value"],"Sort Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Sort Method":"external merge","Sort Space Used":131800,"Sort Space Type":"Disk","Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Seq Scan","Parent Relationship":"Outer","Parallel Aware":true,"Async Capable":false,"Relation Name":"metrics","Schema":"public","Alias":"metrics","Startup Cost":0.0,"Total Cost":129740.6,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":114.724,"Actual Total Time":520.531,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","date_trunc('day'::text, recorded_at)","value"],"Shared Hit Blocks":1472,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":0,"Temp Written Blocks":0}]}]}]}]},"Planning":{"Shared Hit Blocks":104,"Shared Read Blocks":0,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":0,"Temp Written Blocks":0},"Planning Time":0.335,"Triggers":[],"JIT":{"Functions":24,"Options":{"Inlining":true,"Optimization":true,"Expressions":true,"Deforming":true},"Timing":{"Generation":1.648,"Inlining":152.18,"Optimization":92.961,"Emission":98.979,"Total":345.768}},"Execution Time":3482.808},
+    plan: {"Plan":{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Finalize","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":2150146.18,"Plan Rows":10000052,"Plan Width":51,"Actual Startup Time":2624.92,"Actual Total Time":3461.001,"Actual Rows":1830,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","avg(value)","max(value)","min(value)","count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Gather Merge","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":1875144.76,"Plan Rows":8333376,"Plan Width":75,"Actual Startup Time":2624.439,"Actual Total Time":3459.345,"Actual Rows":5490,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","(PARTIAL avg(value))","(PARTIAL max(value))","(PARTIAL min(value))","(PARTIAL count(*))"],"Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Partial","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":912266.37,"Plan Rows":4166688,"Plan Width":75,"Actual Startup Time":2528.741,"Actual Total Time":3367.829,"Actual Rows":1830,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","PARTIAL avg(value)","PARTIAL max(value)","PARTIAL min(value)","PARTIAL count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":2712,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98837,"Temp Written Blocks":99030,"Plans":[{"Node Type":"Sort","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":797682.45,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":2528.589,"Actual Total Time":2953.578,"Actual Rows":3333333,"Actual Loops":3,"Sort Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Sort Method":"external merge","Sort Space Used":133792,"Sort Space Type":"Disk","Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":2712,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98837,"Temp Written Blocks":99030,"Plans":[{"Node Type":"Seq Scan","Parallel Aware":true,"Relation Name":"public.metrics","Alias":"metrics","Startup Cost":0.00,"Total Cost":129740.60,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":135.546,"Actual Total Time":678.481,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","date_trunc('day'::text, recorded_at)","value"],"Shared Hit Blocks":2624,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0}]}]}]}]}}
   },
+  // ── User example: Full scan on telemetry ──
   {
-    title: 'Sequential Scan with Filter',
-    sql: 'EXPLAIN SELECT * FROM users WHERE age > 25;',
-    plan: ` Seq Scan on users  (cost=0.00..458.00 rows=101 width=244) (actual time=0.012..0.045 rows=101 loops=1)
-   Filter: (age > 25)
-   Rows Removed by Filter: 899
- Planning Time: 0.065 ms
- Execution Time: 0.064 ms`,
+    title: '#1 — Full scan on telemetry (no time filter)',
+    sql: 'SELECT metric_name, avg(value), max(value), min(value), count(*) FROM metrics GROUP BY metric_name;',
+    plan: ` HashAggregate  (cost=100000.00..110000.00 rows=100 width=48) (actual time=4500.000..5500.000 rows=120 loops=1)
+   Group Key: metric_name
+   Batches: 1  Memory Usage: 4096kB
+   ->  Seq Scan on metrics  (cost=0.00..85000.00 rows=10000000 width=16) (actual time=0.010..1200.000 rows=10000000 loops=1)
+ Planning Time: 0.500 ms
+ Execution Time: 5500.500 ms`,
   },
+  // ── User example: Aggregation over entire events ──
   {
-    title: 'Sort with Sequential Scan',
-    sql: 'EXPLAIN SELECT * FROM users ORDER BY created_at DESC;',
-    plan: ` Sort  (cost=1000.45..1000.46 rows=1 width=8) (actual time=0.045..0.046 rows=1 loops=1)
-   Sort Key: created_at DESC
+    title: '#2 — Aggregation over entire events table',
+    sql: 'SELECT event_type, count(*), count(DISTINCT user_id) FROM events GROUP BY event_type ORDER BY count(*) DESC;',
+    plan: ` Sort  (cost=50000.00..50005.00 rows=20 width=16) (actual time=800.000..800.050 rows=15 loops=1)
+   Sort Key: (count(*)) DESC
    Sort Method: quicksort  Memory: 25kB
-   ->  Seq Scan on users  (cost=0.00..1000.00 rows=1 width=8) (actual time=0.012..0.013 rows=1 loops=1)
- Planning Time: 0.065 ms
- Execution Time: 0.064 ms`,
+   ->  HashAggregate  (cost=49000.00..49980.00 rows=20 width=16) (actual time=750.000..795.000 rows=15 loops=1)
+         Group Key: event_type
+         Batches: 1  Memory Usage: 401kB
+         ->  Seq Scan on events  (cost=0.00..45000.00 rows=500000 width=8) (actual time=0.010..350.000 rows=500000 loops=1)
+ Planning Time: 0.350 ms
+ Execution Time: 805.000 ms`,
   },
+  // ── User example: Text search on logs (no index) ──
   {
-    title: 'Nested Loop Join',
-    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id;',
-    plan: ` Nested Loop  (cost=0.00..350.00 rows=1000 width=128) (actual time=0.012..0.520 rows=1000 loops=1)
-   Join Filter: (u.id = o.user_id)
-   ->  Seq Scan on users u  (cost=0.00..100.00 rows=1000 width=64) (actual time=0.010..0.045 rows=1000 loops=1)
-   ->  Seq Scan on orders o  (cost=0.00..200.00 rows=2000 width=64) (actual time=0.002..0.180 rows=2000 loops=1)
- Planning Time: 0.120 ms
- Execution Time: 0.540 ms`,
+    title: '#3 — Text search on logs (no index on message)',
+    sql: "SELECT session_id, count(*) AS error_count FROM logs WHERE message ILIKE '%error%' OR message ILIKE '%fail%' OR message ILIKE '%timeout%' GROUP BY session_id ORDER BY error_count DESC;",
+    plan: ` Sort  (cost=95000.00..95250.00 rows=100000 width=18) (actual time=3200.000..3250.000 rows=12000 loops=1)
+   Sort Key: (count(*)) DESC
+   Sort Method: external merge  Disk: 64000kB
+   ->  HashAggregate  (cost=60000.00..70000.00 rows=100000 width=18) (actual time=1800.000..2800.000 rows=12000 loops=1)
+         Group Key: session_id
+         Batches: 1  Memory Usage: 8192kB
+         ->  Seq Scan on logs  (cost=0.00..50000.00 rows=1000000 width=10) (actual time=0.010..800.000 rows=1000000 loops=1)
+               Filter: ((message ~~* '%error%'::text) OR (message ~~* '%fail%'::text) OR (message ~~* '%timeout%'::text))
+               Rows Removed by Filter: 900000
+ Planning Time: 0.420 ms
+ Execution Time: 3300.000 ms`,
   },
+  // ── User example: Cross-table aggregation without filters ──
   {
-    title: 'Hash Join',
-    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id WHERE u.status = \'active\';',
-    plan:` Hash Join  (cost=150.00..400.00 rows=500 width=128) (actual time=0.100..0.350 rows=500 loops=1)
-   Hash Cond: (o.user_id = u.id)
-   ->  Seq Scan on orders o  (cost=0.00..200.00 rows=2000 width=64) (actual time=0.005..0.150 rows=2000 loops=1)
-   ->  Hash  (cost=100.00..100.00 rows=500 width=64) (actual time=0.080..0.080 rows=500 loops=1)
-         ->  Seq Scan on users u  (cost=0.00..100.00 rows=500 width=64) (actual time=0.010..0.040 rows=500 loops=1)
-               Filter: (status = 'active')
-               Rows Removed by Filter: 500
- Planning Time: 0.150 ms
- Execution Time: 0.380 ms`,
+    title: '#4 — Cross-table aggregation (subqueries)',
+    sql: 'SELECT u.id, u.name, (SELECT count(*) FROM posts WHERE fk_user_id = u.id) AS post_count, (SELECT count(*) FROM comments WHERE fk_user_id = u.id) AS comment_count, (SELECT count(*) FROM friends WHERE user_id = u.id OR friend_id = u.id) AS friend_count FROM users_profile u ORDER BY u.id;',
+    plan: ` Sort  (cost=1000000.00..1000500.00 rows=100000 width=20) (actual time=5000.000..5020.000 rows=100000 loops=1)
+   Sort Key: u.id
+   Sort Method: quicksort  Memory: 10240kB
+   ->  Seq Scan on users_profile u  (cost=0.00..950000.00 rows=100000 width=20) (actual time=0.010..4200.000 rows=100000 loops=1)
+         SubPlan 1 (post_count)
+           ->  Aggregate  (cost=2.50..2.51 rows=1 width=8) (actual time=0.015..0.015 rows=1 loops=100000)
+                 ->  Index Only Scan using idx_posts_user on posts  (cost=0.50..2.50 rows=5 width=0) (actual time=0.010..0.012 rows=5 loops=100000)
+                       Index Cond: (fk_user_id = u.id)
+                       Heap Fetches: 5
+         SubPlan 2 (comment_count)
+           ->  Aggregate  (cost=4.00..4.01 rows=1 width=8) (actual time=0.030..0.030 rows=1 loops=100000)
+                 ->  Index Only Scan using idx_comments_user on comments  (cost=0.50..4.00 rows=20 width=0) (actual time=0.020..0.025 rows=20 loops=100000)
+                       Index Cond: (fk_user_id = u.id)
+                       Heap Fetches: 20
+         SubPlan 3 (friend_count)
+           ->  Aggregate  (cost=6.00..6.01 rows=1 width=8) (actual time=0.050..0.050 rows=1 loops=100000)
+                 ->  Seq Scan on friends  (cost=0.00..5.00 rows=10 width=0) (actual time=0.020..0.030 rows=10 loops=100000)
+                       Filter: ((user_id = u.id) OR (friend_id = u.id))
+                       Rows Removed by Filter: 999990
+ Planning Time: 1.200 ms
+ Execution Time: 5025.000 ms`,
   },
+  // ── User example: All posts + comments for every user ──
   {
-    title: 'Index Scan with Bitmap Scan',
-    sql: 'EXPLAIN SELECT * FROM orders WHERE total > 100 AND created_at > \'2024-01-01\';',
-    plan: ` Bitmap Heap Scan on orders  (cost=12.34..250.00 rows=150 width=64) (actual time=0.050..0.200 rows=150 loops=1)
-   Recheck Cond: (total > 100)
-   Filter: (created_at > '2024-01-01')
-   Rows Removed by Filter: 30
-   Heap Fetches: 150
-   ->  Bitmap Index Scan on idx_orders_total  (cost=0.00..12.30 rows=180 width=0) (actual time=0.030..0.030 rows=180 loops=1)
-         Index Cond: (total > 100)
- Planning Time: 0.090 ms
- Execution Time: 0.220 ms`,
+    title: '#5 — All posts + comments (multi-way joins)',
+    sql: 'SELECT u.name, p.content AS post_content, p.created_at AS post_date, c.content AS comment_content, c.created_at AS comment_date, cu.name AS commenter_name FROM users_profile u JOIN posts p ON p.fk_user_id = u.id JOIN comments c ON c.fk_post_id = p.id JOIN users_profile cu ON cu.id = c.fk_user_id ORDER BY u.id, p.created_at;',
+    plan: ` Sort  (cost=2000000.00..2100000.00 rows=500000 width=128) (actual time=15000.000..15500.000 rows=800000 loops=1)
+   Sort Key: u.id, p.created_at
+   Sort Method: external merge  Disk: 256000kB
+   ->  Hash Join  (cost=50000.00..1200000.00 rows=500000 width=128) (actual time=500.000..12000.000 rows=800000 loops=1)
+         Hash Cond: (c.fk_user_id = cu.id)
+         ->  Hash Join  (cost=25000.00..900000.00 rows=500000 width=96) (actual time=300.000..9000.000 rows=800000 loops=1)
+               Hash Cond: (c.fk_post_id = p.id)
+               ->  Hash Join  (cost=10000.00..600000.00 rows=500000 width=64) (actual time=200.000..5000.000 rows=800000 loops=1)
+                     Hash Cond: (p.fk_user_id = u.id)
+                     ->  Seq Scan on posts p  (cost=0.00..350000.00 rows=500000 width=36) (actual time=0.010..1000.000 rows=500000 loops=1)
+                     ->  Hash  (cost=5000.00..5000.00 rows=100000 width=20) (actual time=150.000..150.000 rows=100000 loops=1)
+                           ->  Seq Scan on users_profile u  (cost=0.00..5000.00 rows=100000 width=20) (actual time=0.010..80.000 rows=100000 loops=1)
+               ->  Hash  (cost=10000.00..10000.00 rows=2000000 width=24) (actual time=200.000..200.000 rows=2000000 loops=1)
+                     ->  Seq Scan on comments c  (cost=0.00..10000.00 rows=2000000 width=24) (actual time=0.010..150.000 rows=2000000 loops=1)
+         ->  Hash  (cost=15000.00..15000.00 rows=100000 width=20) (actual time=100.000..100.000 rows=100000 loops=1)
+               ->  Seq Scan on users_profile cu  (cost=0.00..5000.00 rows=100000 width=20) (actual time=0.010..50.000 rows=100000 loops=1)
+ Planning Time: 2.500 ms
+ Execution Time: 15520.000 ms`,
   },
+  // ── User example: Friend-of-friend expansion ──
   {
-    title: 'Aggregate with Group By',
-    sql: 'EXPLAIN SELECT status, COUNT(*) FROM users GROUP BY status;',
-    plan: ` HashAggregate  (cost=150.00..152.00 rows=5 width=12) (actual time=0.080..0.082 rows=5 loops=1)
-   Group Key: status
-   Batches: 1  Memory Usage: 40kB
-   ->  Seq Scan on users  (cost=0.00..100.00 rows=1000 width=4) (actual time=0.005..0.030 rows=1000 loops=1)
- Planning Time: 0.070 ms
- Execution Time: 0.095 ms`,
+    title: '#6 — Friend-of-friend expansion (explosive join)',
+    sql: "SELECT u.id AS user_id, u.name AS user_name, f2.friend_id AS friend_of_friend_id, uf.name AS friend_of_friend_name FROM users_profile u JOIN friends f1 ON f1.user_id = u.id JOIN friends f2 ON f2.user_id = f1.friend_id JOIN users_profile uf ON uf.id = f2.friend_id WHERE u.id <> f2.friend_id ORDER BY u.id;",
+    plan: ` Sort  (cost=3000000.00..3500000.00 rows=4000000 width=24) (actual time=25000.000..26000.000 rows=5000000 loops=1)
+   Sort Key: u.id
+   Sort Method: external merge  Disk: 512000kB
+   ->  Hash Join  (cost=50000.00..2000000.00 rows=4000000 width=24) (actual time=500.000..20000.000 rows=5000000 loops=1)
+         Hash Cond: (f2.friend_id = uf.id)
+         ->  Hash Join  (cost=30000.00..1200000.00 rows=4000000 width=16) (actual time=400.000..15000.000 rows=5000000 loops=1)
+               Hash Cond: (f2.user_id = f1.friend_id)
+               ->  Seq Scan on friends f2  (cost=0.00..500000.00 rows=1000000 width=8) (actual time=0.010..2000.000 rows=1000000 loops=1)
+               ->  Hash  (cost=20000.00..20000.00 rows=1000000 width=16) (actual time=300.000..300.000 rows=1000000 loops=1)
+                     ->  Hash Join  (cost=5000.00..20000.00 rows=1000000 width=16) (actual time=100.000..250.000 rows=1000000 loops=1)
+                           Hash Cond: (f1.user_id = u.id)
+                           ->  Seq Scan on friends f1  (cost=0.00..10000.00 rows=1000000 width=8) (actual time=0.010..50.000 rows=1000000 loops=1)
+                           ->  Hash  (cost=3000.00..3000.00 rows=100000 width=20) (actual time=50.000..50.000 rows=100000 loops=1)
+                                 ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=20) (actual time=0.010..30.000 rows=100000 loops=1)
+         ->  Hash  (cost=10000.00..10000.00 rows=100000 width=8) (actual time=50.000..50.000 rows=100000 loops=1)
+               ->  Seq Scan on users_profile uf  (cost=0.00..3000.00 rows=100000 width=8) (actual time=0.010..25.000 rows=100000 loops=1)
+ Planning Time: 3.000 ms
+ Execution Time: 26500.000 ms`,
   },
+  // ── User example: Time-series self-join ──
   {
-    title: 'Merge Join with Index Scan',
-    sql: 'EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id ORDER BY u.id;',
-    plan: ` Merge Join  (cost=0.50..500.00 rows=1000 width=128) (actual time=0.020..0.480 rows=1000 loops=1)
-   Merge Cond: (u.id = o.user_id)
-   ->  Index Scan using users_pkey on users u  (cost=0.00..200.00 rows=1000 width=64) (actual time=0.010..0.100 rows=1000 loops=1)
-   ->  Index Scan using idx_orders_user_id on orders o  (cost=0.00..250.00 rows=2000 width=64) (actual time=0.005..0.150 rows=2000 loops=1)
- Planning Time: 0.110 ms
- Execution Time: 0.500 ms`,
+    title: '#7 — Time-series self-join (consecutive readings)',
+    sql: 'SELECT a.metric_name, a.recorded_at AS current_ts, a.value AS current_value, b.recorded_at AS previous_ts, b.value AS previous_value, (a.value - b.value) / NULLIF(b.value, 0) * 100 AS pct_change FROM metrics a JOIN metrics b ON b.metric_name = a.metric_name AND b.recorded_at = (SELECT max(recorded_at) FROM metrics WHERE metric_name = a.metric_name AND recorded_at < a.recorded_at) ORDER BY a.metric_name, a.recorded_at;',
+    plan: ` Sort  (cost=8000000.00..8500000.00 rows=10000000 width=32) (actual time=60000.000..65000.000 rows=10000000 loops=1)
+   Sort Key: a.metric_name, a.recorded_at
+   Sort Method: external merge  Disk: 1024000kB
+   ->  Merge Join  (cost=2000000.00..5000000.00 rows=10000000 width=32) (actual time=15000.000..45000.000 rows=10000000 loops=1)
+         Merge Cond: ((a.metric_name = b.metric_name) AND (a.recorded_at = b.recorded_at))
+         ->  Index Scan using idx_metrics_name_time on metrics a  (cost=0.50..2000000.00 rows=10000000 width=24) (actual time=0.010..15000.000 rows=10000000 loops=1)
+         ->  Materialize  (cost=1000000.00..2000000.00 rows=10000000 width=16) (actual time=8000.000..25000.000 rows=10000000 loops=1)
+               ->  Seq Scan on metrics b  (cost=0.00..1500000.00 rows=10000000 width=16) (actual time=0.010..5000.000 rows=10000000 loops=1)
+                     SubPlan 1
+                       ->  Aggregate  (cost=10.00..10.01 rows=1 width=8) (actual time=0.020..0.020 rows=1 loops=10000000)
+                             ->  Seq Scan on metrics  (cost=0.00..10.00 rows=10 width=8) (actual time=0.010..0.015 rows=10 loops=10000000)
+                                   Filter: ((metric_name = a.metric_name) AND (recorded_at < a.recorded_at))
+                                   Rows Removed by Filter: 9999990
+ Planning Time: 5.000 ms
+ Execution Time: 65500.000 ms`,
   },
+  // ── User example: INNER JOIN ──
   {
-    title: 'Multi-level: Nested Loop with Index Scan and Filter (TPC-H style)',
-    sql: 'EXPLAIN SELECT * FROM customers c JOIN orders o ON c.custkey = o.custkey JOIN lineitems l ON o.orderkey = l.orderkey WHERE c.nationkey = 10;',
-    plan: ` Nested Loop  (cost=10.00..850.00 rows=500 width=256) (actual time=0.050..0.800 rows=500 loops=1)
-     Join Filter: (o.orderkey = l.orderkey)
-     ->  Nested Loop  (cost=5.00..400.00 rows=200 width=128) (actual time=0.030..0.350 rows=200 loops=1)
-           Join Filter: (c.custkey = o.custkey)
-           ->  Seq Scan on customers c  (cost=0.00..100.00 rows=50 width=64) (actual time=0.010..0.020 rows=50 loops=1)
-                 Filter: (nationkey = 10)
-                 Rows Removed by Filter: 950
-           ->  Seq Scan on orders o  (cost=0.00..250.00 rows=500 width=64) (actual time=0.005..0.150 rows=500 loops=1)
-     ->  Seq Scan on lineitems l  (cost=0.00..400.00 rows=1000 width=128) (actual time=0.010..0.200 rows=1000 loops=1)
-   Planning Time: 0.180 ms
-   Execution Time: 0.850 ms`,
+    title: '#8 — INNER JOIN (users with their posts)',
+    sql: 'SELECT u.name, p.content, p.created_at FROM users_profile u JOIN posts p ON p.fk_user_id = u.id;',
+    plan: ` Hash Join  (cost=5000.00..350000.00 rows=500000 width=36) (actual time=50.000..3000.000 rows=500000 loops=1)
+   Hash Cond: (p.fk_user_id = u.id)
+   ->  Seq Scan on posts p  (cost=0.00..250000.00 rows=500000 width=28) (actual time=0.010..800.000 rows=500000 loops=1)
+   ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
+         ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
+ Planning Time: 0.300 ms
+ Execution Time: 3050.000 ms`,
+  },
+  // ── User example: LEFT JOIN ──
+  {
+    title: '#9 — LEFT JOIN (all users with or without posts)',
+    sql: 'SELECT u.name, p.id AS post_id, p.content FROM users_profile u LEFT JOIN posts p ON p.fk_user_id = u.id ORDER BY u.name;',
+    plan: ` Sort  (cost=360000.00..370000.00 rows=500000 width=28) (actual time=3500.000..3600.000 rows=500000 loops=1)
+   Sort Key: u.name
+   Sort Method: quicksort  Memory: 51200kB
+   ->  Hash Left Join  (cost=5000.00..200000.00 rows=500000 width=28) (actual time=50.000..2500.000 rows=500000 loops=1)
+         Hash Cond: (p.fk_user_id = u.id)
+         ->  Seq Scan on posts p  (cost=0.00..150000.00 rows=500000 width=20) (actual time=0.010..600.000 rows=500000 loops=1)
+         ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
+               ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
+ Planning Time: 0.400 ms
+ Execution Time: 3650.000 ms`,
+  },
+  // ── User example: RIGHT JOIN ──
+  {
+    title: '#10 — RIGHT JOIN (posts and commenters)',
+    sql: 'SELECT p.id AS post_id, u.name AS commenter, c.content FROM comments c RIGHT JOIN posts p ON p.id = c.fk_post_id LEFT JOIN users_profile u ON u.id = c.fk_user_id;',
+    plan: ` Hash Right Join  (cost=10000.00..700000.00 rows=2000000 width=36) (actual time=100.000..5000.000 rows=2000000 loops=1)
+   Hash Cond: (c.fk_post_id = p.id)
+   ->  Hash Left Join  (cost=5000.00..400000.00 rows=2000000 width=24) (actual time=50.000..3000.000 rows=2000000 loops=1)
+         Hash Cond: (c.fk_user_id = u.id)
+         ->  Seq Scan on comments c  (cost=0.00..100000.00 rows=2000000 width=16) (actual time=0.010..500.000 rows=2000000 loops=1)
+         ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
+               ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
+   ->  Hash  (cost=3000.00..3000.00 rows=500000 width=16) (actual time=40.000..40.000 rows=500000 loops=1)
+         ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=16) (actual time=0.010..20.000 rows=500000 loops=1)
+ Planning Time: 0.600 ms
+ Execution Time: 5100.000 ms`,
+  },
+  // ── User example: FULL OUTER JOIN ──
+  {
+    title: '#11 — FULL OUTER JOIN (bidirectional friendships)',
+    sql: 'SELECT COALESCE(f1.user_id, f2.friend_id) AS user_id, COALESCE(f1.friend_id, f2.user_id) AS friend_id FROM friends f1 FULL OUTER JOIN friends f2 ON f2.user_id = f1.friend_id AND f2.friend_id = f1.user_id WHERE f1.user_id IS NULL OR f2.user_id IS NULL;',
+    plan: ` Hash Full Join  (cost=50000.00..200000.00 rows=2000000 width=8) (actual time=500.000..3000.000 rows=1000000 loops=1)
+   Hash Cond: ((f1.friend_id = f2.user_id) AND (f1.user_id = f2.friend_id))
+   Filter: ((f1.user_id IS NULL) OR (f2.user_id IS NULL))
+   Rows Removed by Filter: 500000
+   ->  Seq Scan on friends f1  (cost=0.00..50000.00 rows=1000000 width=8) (actual time=0.010..500.000 rows=1000000 loops=1)
+   ->  Hash  (cost=30000.00..30000.00 rows=1000000 width=8) (actual time=300.000..300.000 rows=1000000 loops=1)
+         ->  Seq Scan on friends f2  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..200.000 rows=1000000 loops=1)
+ Planning Time: 0.800 ms
+ Execution Time: 3050.000 ms`,
+  },
+  // ── User example: SELF JOIN (mutual friends) ──
+  {
+    title: '#12 — SELF JOIN (mutual friend recommendations)',
+    sql: "SELECT f1.user_id AS user_a, f2.friend_id AS suggested_friend, count(*) AS mutual_count FROM friends f1 JOIN friends f2 ON f2.user_id = f1.friend_id WHERE f2.friend_id <> f1.user_id AND (f1.user_id, f2.friend_id) NOT IN (SELECT user_id, friend_id FROM friends) GROUP BY f1.user_id, f2.friend_id ORDER BY mutual_count DESC;",
+    plan: ` Sort  (cost=5000000.00..5500000.00 rows=5000000 width=12) (actual time=40000.000..45000.000 rows=8000000 loops=1)
+   Sort Key: (count(*)) DESC
+   Sort Method: external merge  Disk: 512000kB
+   ->  HashAggregate  (cost=2000000.00..2500000.00 rows=5000000 width=12) (actual time=15000.000..25000.000 rows=8000000 loops=1)
+         Group Key: f1.user_id, f2.friend_id
+         Batches: 1  Memory Usage: 262144kB
+         ->  Hash Anti Join  (cost=500000.00..1500000.00 rows=5000000 width=8) (actual time=5000.000..12000.000 rows=8000000 loops=1)
+               Hash Cond: ((f1.user_id = friends.user_id) AND (f2.friend_id = friends.friend_id))
+               ->  Hash Join  (cost=5000.00..500000.00 rows=5000000 width=8) (actual time=100.000..5000.000 rows=8000000 loops=1)
+                     Hash Cond: (f2.user_id = f1.friend_id)
+                     ->  Seq Scan on friends f2  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..200.000 rows=1000000 loops=1)
+                     ->  Hash  (cost=3000.00..3000.00 rows=1000000 width=8) (actual time=50.000..50.000 rows=1000000 loops=1)
+                           ->  Seq Scan on friends f1  (cost=0.00..3000.00 rows=1000000 width=8) (actual time=0.010..30.000 rows=1000000 loops=1)
+               ->  Hash  (cost=300000.00..300000.00 rows=1000000 width=8) (actual time=2000.000..2000.000 rows=1000000 loops=1)
+                     ->  Seq Scan on friends  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..500.000 rows=1000000 loops=1)
+ Planning Time: 4.000 ms
+ Execution Time: 46000.000 ms`,
+  },
+  // ── User example: CROSS JOIN ──
+  {
+    title: '#13 — CROSS JOIN (analytics grid)',
+    sql: "SELECT u.id AS user_id, e_types.event_type, count(e.id) AS event_count FROM users_profile u CROSS JOIN (SELECT DISTINCT event_type FROM events) e_types LEFT JOIN events e ON e.user_id = u.id AND e.event_type = e_types.event_type GROUP BY u.id, e_types.event_type ORDER BY u.id, e_types.event_type;",
+    plan: ` Sort  (cost=800000.00..900000.00 rows=1500000 width=12) (actual time=6000.000..6500.000 rows=1500000 loops=1)
+   Sort Key: u.id, e_types.event_type
+   Sort Method: quicksort  Memory: 102400kB
+   ->  HashAggregate  (cost=500000.00..600000.00 rows=1500000 width=12) (actual time=3000.000..4500.000 rows=1500000 loops=1)
+         Group Key: u.id, e_types.event_type
+         Batches: 1  Memory Usage: 102401kB
+         ->  Hash Right Join  (cost=50000.00..300000.00 rows=1500000 width=8) (actual time=500.000..2500.000 rows=1500000 loops=1)
+               Hash Cond: ((e.user_id = u.id) AND (e.event_type = e_types.event_type))
+               ->  Seq Scan on events e  (cost=0.00..100000.00 rows=500000 width=8) (actual time=0.010..300.000 rows=500000 loops=1)
+               ->  Hash  (cost=40000.00..40000.00 rows=1500000 width=8) (actual time=400.000..400.000 rows=1500000 loops=1)
+                     ->  Nested Loop  (cost=5000.00..40000.00 rows=1500000 width=8) (actual time=100.000..350.000 rows=1500000 loops=1)
+                           ->  HashAggregate  (cost=5000.00..5005.00 rows=15 width=8) (actual time=100.000..100.050 rows=15 loops=1)
+                                 Group Key: events.event_type
+                                 ->  Seq Scan on events  (cost=0.00..4500.00 rows=500000 width=8) (actual time=0.010..50.000 rows=500000 loops=1)
+                           ->  Seq Scan on users_profile u  (cost=0.00..2000.00 rows=100000 width=4) (actual time=0.010..1.000 rows=100000 loops=1)
+ Planning Time: 1.500 ms
+ Execution Time: 6600.000 ms`,
+  },
+  // ── User example: Semi-join via EXISTS ──
+  {
+    title: '#14 — Semi-join via EXISTS (users who commented)',
+    sql: 'SELECT u.id, u.name, u.email FROM users_profile u WHERE EXISTS (SELECT 1 FROM comments c WHERE c.fk_user_id = u.id);',
+    plan: ` Hash Semi Join  (cost=5000.00..150000.00 rows=80000 width=28) (actual time=50.000..2000.000 rows=80000 loops=1)
+   Hash Cond: (u.id = c.fk_user_id)
+   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=28) (actual time=0.010..20.000 rows=100000 loops=1)
+   ->  Hash  (cost=4000.00..4000.00 rows=2000000 width=4) (actual time=40.000..40.000 rows=2000000 loops=1)
+         ->  Seq Scan on comments c  (cost=0.00..4000.00 rows=2000000 width=4) (actual time=0.010..20.000 rows=2000000 loops=1)
+ Planning Time: 0.250 ms
+ Execution Time: 2050.000 ms`,
+  },
+  // ── User example: Anti-join via NOT EXISTS ──
+  {
+    title: '#15 — Anti-join via NOT EXISTS (users who never posted)',
+    sql: 'SELECT u.id, u.name, u.email FROM users_profile u WHERE NOT EXISTS (SELECT 1 FROM posts p WHERE p.fk_user_id = u.id);',
+    plan: ` Hash Anti Join  (cost=5000.00..120000.00 rows=20000 width=28) (actual time=50.000..1000.000 rows=20000 loops=1)
+   Hash Cond: (u.id = p.fk_user_id)
+   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=28) (actual time=0.010..20.000 rows=100000 loops=1)
+   ->  Hash  (cost=3000.00..3000.00 rows=500000 width=4) (actual time=20.000..20.000 rows=500000 loops=1)
+         ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=4) (actual time=0.010..10.000 rows=500000 loops=1)
+ Planning Time: 0.200 ms
+ Execution Time: 1050.000 ms`,
+  },
+  // ── User example: LATERAL join ──
+  {
+    title: '#16 — LATERAL join (top 3 comments per post)',
+    sql: 'SELECT p.id AS post_id, c.id AS comment_id, c.content AS comment_text, u.name AS commenter FROM posts p CROSS JOIN LATERAL (SELECT id, content, fk_user_id FROM comments WHERE fk_post_id = p.id ORDER BY created_at DESC LIMIT 3) c JOIN users_profile u ON u.id = c.fk_user_id ORDER BY p.id, c.id;',
+    plan: ` Nested Loop  (cost=5000.00..2000000.00 rows=1500000 width=48) (actual time=100.000..15000.000 rows=1500000 loops=1)
+   Join Filter: (u.id = c.fk_user_id)
+   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
+   ->  Materialize  (cost=5000.00..1000000.00 rows=1500000 width=24) (actual time=0.010..0.050 rows=1500000 loops=1)
+         ->  Nested Loop  (cost=5000.00..500000.00 rows=1500000 width=24) (actual time=100.000..10000.000 rows=1500000 loops=1)
+               ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=4) (actual time=0.010..10.000 rows=500000 loops=1)
+               ->  Limit  (cost=1.00..1.50 rows=3 width=20) (actual time=0.020..0.020 rows=3 loops=500000)
+                     ->  Sort  (cost=1.00..1.50 rows=3 width=20) (actual time=0.020..0.020 rows=3 loops=500000)
+                           Sort Key: comments.created_at DESC
+                           Sort Method: quicksort  Memory: 25kB
+                           ->  Seq Scan on comments  (cost=0.00..1.00 rows=3 width=20) (actual time=0.010..0.010 rows=3 loops=500000)
+                                 Filter: (fk_post_id = p.id)
+                                 Rows Removed by Filter: 1999997
+ Planning Time: 2.000 ms
+ Execution Time: 15500.000 ms`,
+  },
+  // ── User example: Multi-way join with aggregation ──
+  {
+    title: '#17 — Multi-way join with aggregation (user engagement)',
+    sql: 'SELECT u.id, u.name, count(DISTINCT p.id) AS total_posts, count(DISTINCT c.id) AS total_comments_received, count(DISTINCT fr.user_id) AS friend_count FROM users_profile u LEFT JOIN posts p ON p.fk_user_id = u.id LEFT JOIN comments c ON c.fk_post_id = p.id LEFT JOIN friends fr ON fr.friend_id = u.id GROUP BY u.id, u.name ORDER BY total_posts DESC;',
+    plan: ` Sort  (cost=3000000.00..3100000.00 rows=100000 width=16) (actual time=20000.000..20500.000 rows=100000 loops=1)
+   Sort Key: (count(DISTINCT p.id)) DESC
+   Sort Method: quicksort  Memory: 10240kB
+   ->  GroupAggregate  (cost=2000000.00..2900000.00 rows=100000 width=16) (actual time=10000.000..18000.000 rows=100000 loops=1)
+         Group Key: u.id, u.name
+         ->  Sort  (cost=2000000.00..2200000.00 rows=4000000 width=16) (actual time=10000.000..12000.000 rows=4000000 loops=1)
+               Sort Key: u.id, u.name
+               Sort Method: external merge  Disk: 256000kB
+               ->  Hash Left Join  (cost=100000.00..1000000.00 rows=4000000 width=16) (actual time=1000.000..8000.000 rows=4000000 loops=1)
+                     Hash Cond: (p.fk_user_id = u.id)
+                     ->  Hash Left Join  (cost=50000.00..500000.00 rows=2000000 width=12) (actual time=500.000..4000.000 rows=2000000 loops=1)
+                           Hash Cond: (p.id = c.fk_post_id)
+                           ->  Hash Left Join  (cost=25000.00..250000.00 rows=500000 width=8) (actual time=300.000..2000.000 rows=500000 loops=1)
+                                 Hash Cond: (u.id = fr.friend_id)
+                                 ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
+                                 ->  Hash  (cost=15000.00..15000.00 rows=1000000 width=4) (actual time=200.000..200.000 rows=1000000 loops=1)
+                                       ->  Seq Scan on friends fr  (cost=0.00..15000.00 rows=1000000 width=4) (actual time=0.010..100.000 rows=1000000 loops=1)
+                           ->  Hash  (cost=15000.00..15000.00 rows=2000000 width=8) (actual time=150.000..150.000 rows=2000000 loops=1)
+                                 ->  Seq Scan on comments c  (cost=0.00..10000.00 rows=2000000 width=8) (actual time=0.010..80.000 rows=2000000 loops=1)
+                     ->  Hash  (cost=30000.00..30000.00 rows=500000 width=4) (actual time=300.000..300.000 rows=500000 loops=1)
+                           ->  Seq Scan on posts p  (cost=0.00..25000.00 rows=500000 width=4) (actual time=0.010..150.000 rows=500000 loops=1)
+ Planning Time: 5.000 ms
+ Execution Time: 21000.000 ms`,
   },
 ];
 

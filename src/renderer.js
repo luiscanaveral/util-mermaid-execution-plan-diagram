@@ -55,7 +55,7 @@ function getColor(type, isDark) {
 function getNodeHeight(node) {
   let h = HEADER_H + PAD;
   if (node.relation) h += LINE_H;
-  if (node.rows > 0 || node.hasActuals) h += LINE_H;
+  if (node.notes) h += node.notes.length * LINE_H;
   h += PAD;
   return h;
 }
@@ -201,40 +201,48 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
     ly += LINE_H;
   }
 
-  // Row calculation
-  const noteColor = isDark ? '#6c7086' : '#888';
-  if (node.rows > 0 || node.hasActuals) {
-    let rowNote;
-    if (node.rows > 0 && node.hasActuals) {
-      const total = Math.round(node.actualRows * node.loops);
-      rowNote = `Rows: est ${fmt(node.rows)} / actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
-    } else if (node.rows > 0) {
-      rowNote = `Rows: est ${fmt(node.rows)}`;
-    } else {
-      const total = Math.round(node.actualRows * node.loops);
-      rowNote = `Rows: actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
+  // Notes (row calc + analysis)
+  if (node.notes) {
+    const noteColor = isDark ? '#6c7086' : '#888';
+    for (const note of node.notes) {
+      const isRowNote = /^Rows:/i.test(note);
+      const nText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      nText.setAttribute('x', x + PAD);
+      nText.setAttribute('y', ly + LINE_H / 2);
+      nText.setAttribute('fill', noteColor);
+      nText.setAttribute('font-family', FONT_FAMILY);
+      nText.setAttribute('font-size', isRowNote ? '12' : '11');
+      if (!isRowNote) nText.setAttribute('font-style', 'italic');
+      nText.setAttribute('dominant-baseline', 'middle');
+
+      const prefixSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      prefixSpan.setAttribute('fill', noteColor);
+      prefixSpan.textContent = '\u24D8 ';
+      nText.appendChild(prefixSpan);
+
+      const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      valSpan.setAttribute('fill', textColor);
+      if (isRowNote) valSpan.setAttribute('font-weight', '700');
+      const colon = note.indexOf(':');
+      if (isRowNote && colon > 0) {
+        const labelSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        labelSpan.setAttribute('fill', textColor);
+        labelSpan.setAttribute('font-weight', '700');
+        labelSpan.textContent = note.substring(0, colon + 1);
+        nText.appendChild(labelSpan);
+        const restSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        restSpan.setAttribute('fill', textColor);
+        restSpan.setAttribute('font-weight', '400');
+        restSpan.textContent = note.substring(colon + 1);
+        nText.appendChild(restSpan);
+      } else {
+        valSpan.textContent = note;
+        nText.appendChild(valSpan);
+      }
+
+      g.appendChild(nText);
+      ly += LINE_H;
     }
-
-    const rowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    rowText.setAttribute('x', x + PAD);
-    rowText.setAttribute('y', ly + LINE_H / 2);
-    rowText.setAttribute('fill', noteColor);
-    rowText.setAttribute('font-family', FONT_FAMILY);
-    rowText.setAttribute('font-size', '12');
-    rowText.setAttribute('dominant-baseline', 'middle');
-
-    const prefixSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    prefixSpan.setAttribute('fill', noteColor);
-    prefixSpan.textContent = '\u24D8 ';
-    rowText.appendChild(prefixSpan);
-
-    const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    valSpan.setAttribute('fill', textColor);
-    valSpan.textContent = rowNote;
-    rowText.appendChild(valSpan);
-
-    g.appendChild(rowText);
-    ly += LINE_H;
   }
 }
 

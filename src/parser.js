@@ -278,6 +278,14 @@ function fmt(n) {
   return String(Math.round(n * 10) / 10);
 }
 
+function fmtSize(kb) {
+  const n = parseInt(kb, 10);
+  if (isNaN(n)) return kb;
+  if (n >= 1048576) return (n / 1048576).toFixed(1) + ' GB';
+  if (n >= 1024) return (n / 1024).toFixed(1) + ' MB';
+  return n + ' KB';
+}
+
 export function computeNodeNotes(node) {
   const notes = [];
 
@@ -295,6 +303,39 @@ export function computeNodeNotes(node) {
     notes.push(s);
   }
 
+  // Row estimate accuracy
+  if (node.rows > 0 && node.hasActuals && node.actualRows > 0) {
+    const totalActual = node.actualRows * node.loops;
+    const ratio = totalActual / node.rows;
+    if (ratio > 2) {
+      notes.push(`Estimate off: actual ${ratio.toFixed(1)}× higher than estimated`);
+    } else if (ratio < 0.5) {
+      notes.push(`Estimate off: actual ${(1 / ratio).toFixed(1)}× lower than estimated`);
+    }
+  }
+
+  // Sort analysis
+  const sortMethod = node.properties.find(p => p.key === 'Sort Method');
+  const sortSpace = node.properties.find(p => p.key === 'Sort Space Used');
+  if (sortMethod) {
+    const sm = sortMethod.value.toLowerCase();
+    if (sm.includes('external') || sm.includes('disk')) {
+      let s = `Sort spilled to disk${sortSpace ? ` — used ${fmtSize(sortSpace.value)}` : ''}`;
+      // Parse sort space to estimate work_mem upper bound
+      if (sortSpace) {
+        const kb = parseInt(sortSpace.value, 10);
+        if (!isNaN(kb)) {
+          const mb = kb / 1024;
+          s += ` (work_mem < ${mb >= 1024 ? (mb / 1024).toFixed(1) + ' GB' : Math.ceil(mb) + ' MB'})`;
+        }
+      }
+      notes.push(s);
+    } else if (sm.includes('quicksort') || sm.includes('top-n')) {
+      notes.push(`Sort in memory (${sortMethod.value})`);
+    }
+  }
+
+  // Workers
   const wp = node.properties.find(p => p.key === 'Workers Planned');
   const wl = node.properties.find(p => p.key === 'Workers Launched');
   if (wp) {
