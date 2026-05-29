@@ -1,5 +1,12 @@
 import { NODE_COLORS, NODE_COLORS_DARK } from './styles.js';
 
+function fmt(n) {
+  if (typeof n !== 'number') return String(n);
+  if (n >= 1000000) return (n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K';
+  return String(Math.round(n * 10) / 10);
+}
+
 let uidCounter = 0;
 function uid() { return ++uidCounter; }
 
@@ -48,12 +55,7 @@ function getColor(type, isDark) {
 function getNodeHeight(node) {
   let h = HEADER_H + PAD;
   if (node.relation) h += LINE_H;
-  h += LINE_H;
-  if (node.hasActuals) h += LINE_H;
-  for (const prop of node.properties) {
-    const text = (prop.key ? prop.key + ': ' : '') + prop.value;
-    h += wrapText(text).length * LINE_H;
-  }
+  if (node.rows > 0 || node.hasActuals) h += LINE_H;
   h += PAD;
   return h;
 }
@@ -199,111 +201,40 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
     ly += LINE_H;
   }
 
-  // Cost line
-  const costText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  costText.setAttribute('x', x + PAD);
-  costText.setAttribute('y', ly + LINE_H / 2);
-  costText.setAttribute('fill', mutedColor);
-  costText.setAttribute('font-family', FONT_FAMILY);
-  costText.setAttribute('font-size', '12');
-  costText.setAttribute('dominant-baseline', 'middle');
-
-  const costLabel = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  costLabel.setAttribute('fill', mutedColor);
-  costLabel.textContent = 'Cost: ';
-  costText.appendChild(costLabel);
-  const costVal = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  costVal.setAttribute('fill', textColor);
-  costVal.textContent = `${node.startupCost}..${node.totalCost}`;
-  costText.appendChild(costVal);
-  const rowsLabel = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  rowsLabel.setAttribute('fill', mutedColor);
-  rowsLabel.textContent = '  Rows: ';
-  costText.appendChild(rowsLabel);
-  const rowsVal = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  rowsVal.setAttribute('fill', textColor);
-  rowsVal.textContent = node.rows;
-  costText.appendChild(rowsVal);
-  const widthLabel = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  widthLabel.setAttribute('fill', mutedColor);
-  widthLabel.textContent = '  Width: ';
-  costText.appendChild(widthLabel);
-  const widthVal = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-  widthVal.setAttribute('fill', textColor);
-  widthVal.textContent = node.width;
-  costText.appendChild(widthVal);
-  g.appendChild(costText);
-  ly += LINE_H;
-
-  // Actuals
-  if (node.hasActuals) {
-    const actText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    actText.setAttribute('x', x + PAD);
-    actText.setAttribute('y', ly + LINE_H / 2);
-    actText.setAttribute('fill', mutedColor);
-    actText.setAttribute('font-family', FONT_FAMILY);
-    actText.setAttribute('font-size', '12');
-    actText.setAttribute('dominant-baseline', 'middle');
-
-    const actLabel = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    actLabel.setAttribute('fill', mutedColor);
-    actLabel.textContent = 'Actual: ';
-    actText.appendChild(actLabel);
-    const actVal = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    actVal.setAttribute('fill', textColor);
-    actVal.textContent = `${node.actualStartup}..${node.actualTotal} ms`;
-    actText.appendChild(actVal);
-    const rowsLbl2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    rowsLbl2.setAttribute('fill', mutedColor);
-    rowsLbl2.textContent = '  Rows: ';
-    actText.appendChild(rowsLbl2);
-    const rowsVal2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    rowsVal2.setAttribute('fill', textColor);
-    rowsVal2.textContent = node.actualRows;
-    actText.appendChild(rowsVal2);
-    const loopsLbl = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    loopsLbl.setAttribute('fill', mutedColor);
-    loopsLbl.textContent = '  Loops: ';
-    actText.appendChild(loopsLbl);
-    const loopsVal = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    loopsVal.setAttribute('fill', textColor);
-    loopsVal.textContent = node.loops;
-    actText.appendChild(loopsVal);
-    g.appendChild(actText);
-    ly += LINE_H;
-  }
-
-  // Properties
-  for (const prop of node.properties) {
-    const prefix = prop.key ? prop.key + ': ' : '';
-    const fullText = prefix + prop.value;
-    const lines = wrapText(fullText);
-
-    for (let li = 0; li < lines.length; li++) {
-      const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      pText.setAttribute('x', x + PAD);
-      pText.setAttribute('y', ly + LINE_H / 2);
-      pText.setAttribute('fill', mutedColor);
-      pText.setAttribute('font-family', FONT_FAMILY);
-      pText.setAttribute('font-size', '12');
-      pText.setAttribute('dominant-baseline', 'middle');
-
-      if (li === 0 && prop.key) {
-        const keySpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        keySpan.setAttribute('fill', mutedColor);
-        keySpan.setAttribute('font-weight', '500');
-        keySpan.textContent = prefix;
-        pText.appendChild(keySpan);
-      }
-      const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      valSpan.setAttribute('fill', textColor);
-      valSpan.textContent = li === 0 && prop.key
-        ? lines[0].substring(prefix.length)
-        : lines[li];
-      pText.appendChild(valSpan);
-      g.appendChild(pText);
-      ly += LINE_H;
+  // Row calculation
+  const noteColor = isDark ? '#6c7086' : '#888';
+  if (node.rows > 0 || node.hasActuals) {
+    let rowNote;
+    if (node.rows > 0 && node.hasActuals) {
+      const total = Math.round(node.actualRows * node.loops);
+      rowNote = `Rows: est ${fmt(node.rows)} / actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
+    } else if (node.rows > 0) {
+      rowNote = `Rows: est ${fmt(node.rows)}`;
+    } else {
+      const total = Math.round(node.actualRows * node.loops);
+      rowNote = `Rows: actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
     }
+
+    const rowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    rowText.setAttribute('x', x + PAD);
+    rowText.setAttribute('y', ly + LINE_H / 2);
+    rowText.setAttribute('fill', noteColor);
+    rowText.setAttribute('font-family', FONT_FAMILY);
+    rowText.setAttribute('font-size', '12');
+    rowText.setAttribute('dominant-baseline', 'middle');
+
+    const prefixSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    prefixSpan.setAttribute('fill', noteColor);
+    prefixSpan.textContent = '\u24D8 ';
+    rowText.appendChild(prefixSpan);
+
+    const valSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    valSpan.setAttribute('fill', textColor);
+    valSpan.textContent = rowNote;
+    rowText.appendChild(valSpan);
+
+    g.appendChild(rowText);
+    ly += LINE_H;
   }
 }
 

@@ -149,6 +149,8 @@ function convertJSONNode(jsonNode, depth) {
     }
   }
 
+  node.notes = computeNodeNotes(node);
+
   if (jsonNode['Plans']) {
     for (const child of jsonNode['Plans']) {
       node.children.push(convertJSONNode(child, depth + 1));
@@ -241,6 +243,7 @@ export function parseExplainPlan(text) {
         }
       }
 
+      node.notes = computeNodeNotes(node);
       nodes.push(node);
     }
   }
@@ -266,6 +269,39 @@ function parseProperty(text) {
     return { key: text.substring(0, colonIdx).trim(), value: text.substring(colonIdx + 1).trim() };
   }
   return { key: '', value: text.trim() };
+}
+
+function fmt(n) {
+  if (typeof n !== 'number') return String(n);
+  if (n >= 1000000) return (n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K';
+  return String(Math.round(n * 10) / 10);
+}
+
+export function computeNodeNotes(node) {
+  const notes = [];
+
+  if (node.rows > 0 || node.hasActuals) {
+    let s;
+    if (node.rows > 0 && node.hasActuals) {
+      const total = Math.round(node.actualRows * node.loops);
+      s = `Rows: est ${fmt(node.rows)} / actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
+    } else if (node.rows > 0) {
+      s = `Rows: est ${fmt(node.rows)}`;
+    } else {
+      const total = Math.round(node.actualRows * node.loops);
+      s = `Rows: actual ${fmt(node.actualRows)} × ${node.loops} = ${fmt(total)}`;
+    }
+    notes.push(s);
+  }
+
+  const wp = node.properties.find(p => p.key === 'Workers Planned');
+  const wl = node.properties.find(p => p.key === 'Workers Launched');
+  if (wp) {
+    notes.push(`Workers: ${wp.value} planned${wl ? `, ${wl.value} launched` : ''}`);
+  }
+
+  return notes;
 }
 
 export function formatPlanSummary(parsed) {
