@@ -303,15 +303,14 @@ export function computeNodeNotes(node) {
     notes.push(s);
   }
 
-  // Row estimate accuracy
-  if (node.rows > 0 && node.hasActuals && node.actualRows > 0) {
-    const totalActual = node.actualRows * node.loops;
-    const ratio = totalActual / node.rows;
-    if (ratio > 2) {
-      notes.push(`Estimate off: actual ${ratio.toFixed(1)}× higher than estimated`);
-    } else if (ratio < 0.5) {
-      notes.push(`Estimate off: actual ${(1 / ratio).toFixed(1)}× lower than estimated`);
+  // Execution time
+  if (node.hasActuals) {
+    const totalTime = node.actualTotal * node.loops;
+    let t = `Time: ${node.actualTotal} ms`;
+    if (node.loops > 1) {
+      t += ` (×${node.loops} = ${totalTime.toFixed(1)} ms)`;
     }
+    notes.push(t);
   }
 
   // Sort analysis

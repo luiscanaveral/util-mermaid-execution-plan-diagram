@@ -44,13 +44,10 @@ const parser = {
   },
 };
 
-let currentTheme = 'default';
-
 const renderer = {
   draw(text, id, version, diagram) {
     const data = diagram.db.getData();
-    const isDark = currentTheme === 'dark' || currentTheme === 'base' ||
-      document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement.classList.contains('dark');
     renderPlan(data, id, isDark);
   },
 };
@@ -60,9 +57,4 @@ export const diagram = {
   parser,
   renderer,
   styles: getStyles,
-  init(config) {
-    if (config && config.theme) {
-      currentTheme = config.theme;
-    }
-  },
 };

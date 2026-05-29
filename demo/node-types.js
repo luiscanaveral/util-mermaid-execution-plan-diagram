@@ -1,0 +1,58 @@
+export const NODE_TYPES = [
+  // ── Scan ──
+  { type: 'Seq Scan',         cat: 'scan',     desc: 'Sequential scan — reads every row of the table' },
+  { type: 'Index Scan',       cat: 'scan',     desc: 'Index scan — looks up rows via an index' },
+  { type: 'Index Only Scan',  cat: 'scan',     desc: 'Index-only scan — all needed columns in the index' },
+  { type: 'Bitmap Heap Scan', cat: 'scan',     desc: 'Bitmap scan — fetches heap pages after a bitmap index scan' },
+  { type: 'Bitmap Index Scan',cat: 'scan',     desc: 'Bitmap index scan — builds a bitmap of matching page locations' },
+  { type: 'CTE Scan',         cat: 'scan',     desc: 'CTE scan — reads rows from a materialized CTE' },
+  { type: 'Subquery Scan',    cat: 'scan',     desc: 'Subquery scan — reads rows from an inner subquery' },
+  { type: 'Function Scan',    cat: 'scan',     desc: 'Function scan — scans the result of a set-returning function' },
+  { type: 'Values Scan',      cat: 'scan',     desc: 'Values scan — scans rows from a VALUES list' },
+  { type: 'Tid Scan',         cat: 'scan',     desc: 'Tuple-ID scan — fetches rows by their ctid' },
+  { type: 'Sample Scan',      cat: 'scan',     desc: 'Sample scan — reads a sample of rows (TABLESAMPLE)' },
+  { type: 'Foreign Scan',     cat: 'scan',     desc: 'Foreign scan — reads rows from a foreign data wrapper' },
+  { type: 'Custom Scan',      cat: 'scan',     desc: 'Custom scan — provider-specific scan (e.g. Hadoop)' },
+  // ── Join ──
+  { type: 'Nested Loop',      cat: 'join',     desc: 'Nested-loop join — for each outer row, scan the inner' },
+  { type: 'Hash Join',        cat: 'join',     desc: 'Hash join — builds hash table from one side, probes with the other' },
+  { type: 'Merge Join',       cat: 'join',     desc: 'Merge join — sorts both sides, then merges synchronously' },
+  { type: 'Hash',             cat: 'join',     desc: 'Hash — builds a hash table for the hash join' },
+  { type: 'Memoize',          cat: 'join',     desc: 'Memoize — caches parameterized inner results' },
+  // ── Aggregate ──
+  { type: 'Aggregate',        cat: 'aggregate',desc: 'Aggregate — grouping / aggregation (hash or sort-based)' },
+  { type: 'Partial Aggregate',cat: 'aggregate',desc: 'Partial aggregate — pre-aggregates in a parallel worker' },
+  { type: 'Group Aggregate',  cat: 'aggregate',desc: 'Group aggregate — window-function grouping' },
+  { type: 'Sort',             cat: 'aggregate',desc: 'Sort — orders rows (may spill to disk if work_mem is low)' },
+  { type: 'Incremental Sort', cat: 'aggregate',desc: 'Incremental sort — sorts already-presorted input further' },
+  { type: 'Group Key',        cat: 'aggregate',desc: 'Group key — groups rows by the specified columns' },
+  // ── Modify ──
+  { type: 'Insert',           cat: 'modify',   desc: 'Insert — inserts new rows into a table' },
+  { type: 'Insert on Conflict',cat: 'modify',  desc: 'Insert on conflict — INSERT with ON CONFLICT handling' },
+  { type: 'Update',           cat: 'modify',   desc: 'Update — updates existing rows in a table' },
+  { type: 'Delete',           cat: 'modify',   desc: 'Delete — deletes rows from a table' },
+  { type: 'ModifyTable',      cat: 'modify',   desc: 'Modify table — generic table modification' },
+  // ── Other ──
+  { type: 'Limit',            cat: 'other',    desc: 'Limit — stops after N rows' },
+  { type: 'Append',           cat: 'other',    desc: 'Append — concatenates results from multiple children' },
+  { type: 'Merge Append',     cat: 'other',    desc: 'Merge append — merges sorted child results' },
+  { type: 'Result',           cat: 'other',    desc: 'Result — returns a constant or one-row result' },
+  { type: 'Unique',           cat: 'other',    desc: 'Unique — deduplicates sorted input' },
+  { type: 'Materialize',      cat: 'other',    desc: 'Materialize — caches rows in memory' },
+  { type: 'SetOp',            cat: 'other',    desc: 'Set operation — INTERSECT / EXCEPT' },
+  { type: 'Subquery',         cat: 'other',    desc: 'Subquery — evaluates a scalar subquery' },
+  { type: 'Gather',           cat: 'other',    desc: 'Gather — merges results from parallel workers' },
+  { type: 'Gather Merge',     cat: 'other',    desc: 'Gather merge — merges sorted results from parallel workers' },
+  { type: 'WindowAgg',        cat: 'other',    desc: 'Window aggregate — evaluates window functions' },
+  { type: 'ProjectSet',       cat: 'other',    desc: 'Project set — evaluates set-returning functions in projection' },
+  { type: 'Table Function Scan',cat: 'scan',   desc: 'Table function scan — scans a table function result' },
+  { type: 'Workers',          cat: 'other',    desc: 'Parallel workers — parallel query execution info' },
+];
+
+export const CATEGORIES = [
+  { cat: 'scan',      label: 'Scan',      color: '#4CAF50', colorDark: '#40a02b', icon: '\u229E' },
+  { cat: 'join',      label: 'Join',      color: '#2196F3', colorDark: '#1e66f5', icon: '\u25B6' },
+  { cat: 'aggregate', label: 'Aggregate', color: '#FF9800', colorDark: '#df8e1d', icon: '\u25B6' },
+  { cat: 'modify',    label: 'Modify',    color: '#f44336', colorDark: '#d20f39', icon: '\u25B6' },
+  { cat: 'other',     label: 'Other',     color: '#9E9E9E', colorDark: '#6c7086', icon: '\u25B6' },
+];

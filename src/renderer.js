@@ -192,7 +192,8 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
 
     const iconSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
     iconSpan.setAttribute('fill', mutedColor);
-    iconSpan.textContent = '\u25B6 ';
+    const isScan = /scan/i.test(node.type);
+    iconSpan.textContent = isScan ? '\u229E ' : '\u25B6 ';
     relText.appendChild(iconSpan);
     const nameSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
     nameSpan.textContent = node.relation;

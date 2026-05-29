@@ -13,15 +13,13 @@
     --border: #e5e7eb;
     --accent: #4CAF50;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1e1e2e;
-      --card-bg: #181825;
-      --text: #cdd6f4;
-      --muted: #6c7086;
-      --border: #313244;
-      --accent: #40a02b;
-    }
+  .dark {
+    --bg: #1e1e2e;
+    --card-bg: #181825;
+    --text: #cdd6f4;
+    --muted: #6c7086;
+    --border: #313244;
+    --accent: #40a02b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -36,6 +34,11 @@
     padding: 24px 32px;
     background: var(--card-bg);
   }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .header h1 {
     font-size: 24px;
     font-weight: 700;
@@ -44,6 +47,74 @@
   .header p {
     color: var(--muted);
     font-size: 14px;
+  }
+  .theme-toggle {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+  }
+  .theme-toggle .label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 32px 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tabs button {
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .tabs button:hover {
+    color: var(--text);
+    background: var(--card-bg);
+  }
+  .tabs button.active {
+    color: var(--accent);
+    background: var(--card-bg);
+    border-color: var(--border);
+    font-weight: 600;
+  }
+  .tabs button .count {
+    display: inline-block;
+    background: var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 0 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+    font-weight: 400;
+  }
+  .tabs button.active .count {
+    background: var(--accent);
+    color: #fff;
   }
   .header .badge {
     display: inline-block;
@@ -116,6 +187,58 @@
     overflow-x: auto;
     color: var(--muted);
   }
+  .legend { padding: 16px 32px; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .legend h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .legend-table {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 4px 20px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-type {
+    font-weight: 600;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .legend-desc {
+    color: var(--muted);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .legend-cat {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: #fff;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
   .footer {
     text-align: center;
     padding: 32px;
@@ -124,15 +247,157 @@
     border-top: 1px solid var(--border);
   }
   .footer a { color: var(--accent); }
+
+  /* ── Side panel ── */
+  .panel-toggle {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    padding: 8px 5px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: right 0.3s, color 0.2s;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .panel-toggle:hover { color: var(--accent); }
+  .panel-toggle.open { right: 280px; }
+  .panel-toggle .icon { font-size: 16px; line-height: 1; }
+  .panel-toggle .label { font-size: 9px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .slide-panel {
+    position: fixed;
+    right: -280px;
+    top: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--card-bg);
+    border-left: 1px solid var(--border);
+    z-index: 19;
+    transition: right 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  .slide-panel.open { right: 0; }
+  .slide-panel-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slide-panel-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .slide-panel-header .count {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+  }
+  .slide-panel-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .slide-panel-close:hover { color: var(--text); background: var(--bg); }
+  .slide-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .slide-panel-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .slide-panel-item:hover { background: var(--bg); }
+  .slide-panel-item .n {
+    color: var(--text);
+    font-weight: 400;
+  }
+  .slide-panel-item .cat {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-right: 6px;
+    color: #fff;
+    vertical-align: middle;
+  }
+  .slide-panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 18;
+    background: rgba(0,0,0,0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .slide-panel-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>PostgreSQL Execution Plan Diagram <span class="badge">Mermaid Plugin</span></h1>
-  <p>Visualize <code>EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT TEXT)</code> output as interactive tree diagrams</p>
+  <div class="header-row">
+    <div>
+      <h1>PostgreSQL Execution Plan Diagram <span class="badge">Mermaid Plugin</span></h1>
+      <p>Visualize <code>EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT TEXT)</code> output as interactive tree diagrams</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+      <span id="themeIcon">\u2600\uFE0F</span>
+      <span class="label" id="themeLabel">Light</span>
+    </button>
+  </div>
 </div>
 
+<div class="legend" id="legend"></div>
+<div class="tabs" id="tabs"></div>
 <div class="container" id="examples"></div>
+
+<button class="panel-toggle" id="panelToggle" title="Show example list">
+  <span class="icon">☰</span>
+  <span class="label">Examples</span>
+</button>
+<div class="slide-panel-overlay" id="panelOverlay"></div>
+<div class="slide-panel" id="slidePanel">
+  <div class="slide-panel-header">
+    <h3>Examples <span class="count" id="panelCount"></span></h3>
+    <button class="slide-panel-close" id="panelClose">✕</button>
+  </div>
+  <div class="slide-panel-body" id="panelBody"></div>
+</div>
 
 <div class="footer">
   Built with <a href="https://mermaid.js.org">Mermaid</a> &middot;
@@ -142,6 +407,8 @@
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 import { pgPlanDiagram } from '../src/index.js';
+import { examples } from './examples.js';
+import { NODE_TYPES, CATEGORIES } from './node-types.js';
 
 await mermaid.registerExternalDiagrams([pgPlanDiagram], { lazyLoad: false });
 
@@ -156,383 +423,150 @@ mermaid.initialize({
   fontFamily: '"SF Mono", "Fira Code", monospace',
 });
 
-const examples = [
-  // ── Existing examples ──
-  {
-    title: 'Finalize GroupAggregate (TEXT)',
-    sql: 'EXPLAIN (ANALYZE, COSTS, BUFFERS) SELECT metric_name, date_trunc(\'day\', recorded_at), AVG(value), MAX(value), MIN(value), COUNT(*) FROM metrics GROUP BY metric_name, date_trunc(\'day\', recorded_at);',
-    plan: ` Finalize GroupAggregate  (cost=788265.76..2150146.18 rows=10000052 width=51) (actual time=2898.106..3727.225 rows=1830 loops=1)
-   Output: metric_name, (date_trunc('day'::text, recorded_at)), avg(value), max(value), min(value), count(*)
-   Group Key: metrics.metric_name, (date_trunc('day'::text, metrics.recorded_at))
-   Buffers: shared hit=2712 read=75033, temp read=98837 written=99030
-   ->  Gather Merge  (cost=788265.76..1875144.76 rows=8333376 width=75) (actual time=2897.643..3725.818 rows=5490 loops=1)
-         Output: metric_name, (date_trunc('day'::text, recorded_at)), (PARTIAL avg(value)), (PARTIAL max(value)), (PARTIAL min(value)), (PARTIAL count(*))
-         Workers Planned: 2
-         Workers Launched: 2
-         Buffers: shared hit=2712 read=75033, temp read=98837 written=99030
-         ->  Partial GroupAggregate  (cost=787265.73..912266.37 rows=4166688 width=75) (actual time=2799.618..3615.215 rows=1830 loops=3)
-               Output: metric_name, (date_trunc('day'::text, recorded_at)), PARTIAL avg(value), PARTIAL max(value), PARTIAL min(value), PARTIAL count(*)
-               Group Key: metrics.metric_name, (date_trunc('day'::text, metrics.recorded_at))
-               Buffers: shared hit=2712 read=75033, temp read=98837 written=99030
-               ->  Sort  (cost=787265.73..797682.45 rows=4166688 width=27) (actual time=2799.402..3224.097 rows=3333333 loops=3)
-                     Output: metric_name, (date_trunc('day'::text, recorded_at)), value
-                     Sort Key: metrics.metric_name, (date_trunc('day'::text, metrics.recorded_at))
-                     Sort Method: external merge  Disk: 133792kB
-                     Buffers: shared hit=2712 read=75033, temp read=98837 written=99030
-                     ->  Parallel Seq Scan on public.metrics  (cost=0.00..129740.60 rows=4166688 width=27) (actual time=135.546..678.481 rows=3333333 loops=3)
-                           Output: metric_name, date_trunc('day'::text, recorded_at), value
-                           Buffers: shared hit=2624 read=75033
- Planning Time: 0.717 ms
- Execution Time: 3740.838 ms`,
-  },
-  {
-    title: 'Parallel Aggregate with Sort (EXPLAIN FORMAT JSON)',
-    sql: 'EXPLAIN (ANALYZE, COSTS, BUFFERS, FORMAT JSON) SELECT metric_name, date_trunc(\'day\', recorded_at), AVG(value), MAX(value), MIN(value), COUNT(*) FROM metrics GROUP BY metric_name, date_trunc(\'day\', recorded_at);',
-    format: 'json',
-    plan: {"Plan":{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Finalize","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":2150146.18,"Plan Rows":10000052,"Plan Width":51,"Actual Startup Time":2624.92,"Actual Total Time":3461.001,"Actual Rows":1830,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","avg(value)","max(value)","min(value)","count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Gather Merge","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":788265.76,"Total Cost":1875144.76,"Plan Rows":8333376,"Plan Width":75,"Actual Startup Time":2624.439,"Actual Total Time":3459.345,"Actual Rows":5490,"Actual Loops":1,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","(PARTIAL avg(value))","(PARTIAL max(value))","(PARTIAL min(value))","(PARTIAL count(*))"],"Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":1560,"Shared Read Blocks":76185,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98845,"Temp Written Blocks":99038,"Plans":[{"Node Type":"Aggregate","Strategy":"Sorted","Partial Mode":"Partial","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":912266.37,"Plan Rows":4166688,"Plan Width":75,"Actual Startup Time":2528.741,"Actual Total Time":3367.829,"Actual Rows":1830,"Actual Loops":3,"Output":["metric_name","(date_trunc('day'::text, recorded_at))","PARTIAL avg(value)","PARTIAL max(value)","PARTIAL min(value)","PARTIAL count(*)"],"Group Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Shared Hit Blocks":2712,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98837,"Temp Written Blocks":99030,"Plans":[{"Node Type":"Sort","Parent Relationship":"Outer","Parallel Aware":false,"Async Capable":false,"Startup Cost":787265.73,"Total Cost":797682.45,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":2528.589,"Actual Total Time":2953.578,"Actual Rows":3333333,"Actual Loops":3,"Sort Key":["metrics.metric_name","(date_trunc('day'::text, metrics.recorded_at))"],"Sort Method":"external merge","Sort Space Used":133792,"Sort Space Type":"Disk","Workers Planned":2,"Workers Launched":2,"Shared Hit Blocks":2712,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0,"Temp Read Blocks":98837,"Temp Written Blocks":99030,"Plans":[{"Node Type":"Seq Scan","Parallel Aware":true,"Relation Name":"public.metrics","Alias":"metrics","Startup Cost":0.00,"Total Cost":129740.60,"Plan Rows":4166688,"Plan Width":27,"Actual Startup Time":135.546,"Actual Total Time":678.481,"Actual Rows":3333333,"Actual Loops":3,"Output":["metric_name","date_trunc('day'::text, recorded_at)","value"],"Shared Hit Blocks":2624,"Shared Read Blocks":75033,"Shared Dirtied Blocks":0,"Shared Written Blocks":0,"Local Hit Blocks":0,"Local Read Blocks":0,"Local Dirtied Blocks":0,"Local Written Blocks":0}]}]}]}]}}
-  },
-  // ── User example: Full scan on telemetry ──
-  {
-    title: '#1 — Full scan on telemetry (no time filter)',
-    sql: 'SELECT metric_name, avg(value), max(value), min(value), count(*) FROM metrics GROUP BY metric_name;',
-    plan: ` HashAggregate  (cost=100000.00..110000.00 rows=100 width=48) (actual time=4500.000..5500.000 rows=120 loops=1)
-   Group Key: metric_name
-   Batches: 1  Memory Usage: 4096kB
-   ->  Seq Scan on metrics  (cost=0.00..85000.00 rows=10000000 width=16) (actual time=0.010..1200.000 rows=10000000 loops=1)
- Planning Time: 0.500 ms
- Execution Time: 5500.500 ms`,
-  },
-  // ── User example: Aggregation over entire events ──
-  {
-    title: '#2 — Aggregation over entire events table',
-    sql: 'SELECT event_type, count(*), count(DISTINCT user_id) FROM events GROUP BY event_type ORDER BY count(*) DESC;',
-    plan: ` Sort  (cost=50000.00..50005.00 rows=20 width=16) (actual time=800.000..800.050 rows=15 loops=1)
-   Sort Key: (count(*)) DESC
-   Sort Method: quicksort  Memory: 25kB
-   ->  HashAggregate  (cost=49000.00..49980.00 rows=20 width=16) (actual time=750.000..795.000 rows=15 loops=1)
-         Group Key: event_type
-         Batches: 1  Memory Usage: 401kB
-         ->  Seq Scan on events  (cost=0.00..45000.00 rows=500000 width=8) (actual time=0.010..350.000 rows=500000 loops=1)
- Planning Time: 0.350 ms
- Execution Time: 805.000 ms`,
-  },
-  // ── User example: Text search on logs (no index) ──
-  {
-    title: '#3 — Text search on logs (no index on message)',
-    sql: "SELECT session_id, count(*) AS error_count FROM logs WHERE message ILIKE '%error%' OR message ILIKE '%fail%' OR message ILIKE '%timeout%' GROUP BY session_id ORDER BY error_count DESC;",
-    plan: ` Sort  (cost=95000.00..95250.00 rows=100000 width=18) (actual time=3200.000..3250.000 rows=12000 loops=1)
-   Sort Key: (count(*)) DESC
-   Sort Method: external merge  Disk: 64000kB
-   ->  HashAggregate  (cost=60000.00..70000.00 rows=100000 width=18) (actual time=1800.000..2800.000 rows=12000 loops=1)
-         Group Key: session_id
-         Batches: 1  Memory Usage: 8192kB
-         ->  Seq Scan on logs  (cost=0.00..50000.00 rows=1000000 width=10) (actual time=0.010..800.000 rows=1000000 loops=1)
-               Filter: ((message ~~* '%error%'::text) OR (message ~~* '%fail%'::text) OR (message ~~* '%timeout%'::text))
-               Rows Removed by Filter: 900000
- Planning Time: 0.420 ms
- Execution Time: 3300.000 ms`,
-  },
-  // ── User example: Cross-table aggregation without filters ──
-  {
-    title: '#4 — Cross-table aggregation (subqueries)',
-    sql: 'SELECT u.id, u.name, (SELECT count(*) FROM posts WHERE fk_user_id = u.id) AS post_count, (SELECT count(*) FROM comments WHERE fk_user_id = u.id) AS comment_count, (SELECT count(*) FROM friends WHERE user_id = u.id OR friend_id = u.id) AS friend_count FROM users_profile u ORDER BY u.id;',
-    plan: ` Sort  (cost=1000000.00..1000500.00 rows=100000 width=20) (actual time=5000.000..5020.000 rows=100000 loops=1)
-   Sort Key: u.id
-   Sort Method: quicksort  Memory: 10240kB
-   ->  Seq Scan on users_profile u  (cost=0.00..950000.00 rows=100000 width=20) (actual time=0.010..4200.000 rows=100000 loops=1)
-         SubPlan 1 (post_count)
-           ->  Aggregate  (cost=2.50..2.51 rows=1 width=8) (actual time=0.015..0.015 rows=1 loops=100000)
-                 ->  Index Only Scan using idx_posts_user on posts  (cost=0.50..2.50 rows=5 width=0) (actual time=0.010..0.012 rows=5 loops=100000)
-                       Index Cond: (fk_user_id = u.id)
-                       Heap Fetches: 5
-         SubPlan 2 (comment_count)
-           ->  Aggregate  (cost=4.00..4.01 rows=1 width=8) (actual time=0.030..0.030 rows=1 loops=100000)
-                 ->  Index Only Scan using idx_comments_user on comments  (cost=0.50..4.00 rows=20 width=0) (actual time=0.020..0.025 rows=20 loops=100000)
-                       Index Cond: (fk_user_id = u.id)
-                       Heap Fetches: 20
-         SubPlan 3 (friend_count)
-           ->  Aggregate  (cost=6.00..6.01 rows=1 width=8) (actual time=0.050..0.050 rows=1 loops=100000)
-                 ->  Seq Scan on friends  (cost=0.00..5.00 rows=10 width=0) (actual time=0.020..0.030 rows=10 loops=100000)
-                       Filter: ((user_id = u.id) OR (friend_id = u.id))
-                       Rows Removed by Filter: 999990
- Planning Time: 1.200 ms
- Execution Time: 5025.000 ms`,
-  },
-  // ── User example: All posts + comments for every user ──
-  {
-    title: '#5 — All posts + comments (multi-way joins)',
-    sql: 'SELECT u.name, p.content AS post_content, p.created_at AS post_date, c.content AS comment_content, c.created_at AS comment_date, cu.name AS commenter_name FROM users_profile u JOIN posts p ON p.fk_user_id = u.id JOIN comments c ON c.fk_post_id = p.id JOIN users_profile cu ON cu.id = c.fk_user_id ORDER BY u.id, p.created_at;',
-    plan: ` Sort  (cost=2000000.00..2100000.00 rows=500000 width=128) (actual time=15000.000..15500.000 rows=800000 loops=1)
-   Sort Key: u.id, p.created_at
-   Sort Method: external merge  Disk: 256000kB
-   ->  Hash Join  (cost=50000.00..1200000.00 rows=500000 width=128) (actual time=500.000..12000.000 rows=800000 loops=1)
-         Hash Cond: (c.fk_user_id = cu.id)
-         ->  Hash Join  (cost=25000.00..900000.00 rows=500000 width=96) (actual time=300.000..9000.000 rows=800000 loops=1)
-               Hash Cond: (c.fk_post_id = p.id)
-               ->  Hash Join  (cost=10000.00..600000.00 rows=500000 width=64) (actual time=200.000..5000.000 rows=800000 loops=1)
-                     Hash Cond: (p.fk_user_id = u.id)
-                     ->  Seq Scan on posts p  (cost=0.00..350000.00 rows=500000 width=36) (actual time=0.010..1000.000 rows=500000 loops=1)
-                     ->  Hash  (cost=5000.00..5000.00 rows=100000 width=20) (actual time=150.000..150.000 rows=100000 loops=1)
-                           ->  Seq Scan on users_profile u  (cost=0.00..5000.00 rows=100000 width=20) (actual time=0.010..80.000 rows=100000 loops=1)
-               ->  Hash  (cost=10000.00..10000.00 rows=2000000 width=24) (actual time=200.000..200.000 rows=2000000 loops=1)
-                     ->  Seq Scan on comments c  (cost=0.00..10000.00 rows=2000000 width=24) (actual time=0.010..150.000 rows=2000000 loops=1)
-         ->  Hash  (cost=15000.00..15000.00 rows=100000 width=20) (actual time=100.000..100.000 rows=100000 loops=1)
-               ->  Seq Scan on users_profile cu  (cost=0.00..5000.00 rows=100000 width=20) (actual time=0.010..50.000 rows=100000 loops=1)
- Planning Time: 2.500 ms
- Execution Time: 15520.000 ms`,
-  },
-  // ── User example: Friend-of-friend expansion ──
-  {
-    title: '#6 — Friend-of-friend expansion (explosive join)',
-    sql: "SELECT u.id AS user_id, u.name AS user_name, f2.friend_id AS friend_of_friend_id, uf.name AS friend_of_friend_name FROM users_profile u JOIN friends f1 ON f1.user_id = u.id JOIN friends f2 ON f2.user_id = f1.friend_id JOIN users_profile uf ON uf.id = f2.friend_id WHERE u.id <> f2.friend_id ORDER BY u.id;",
-    plan: ` Sort  (cost=3000000.00..3500000.00 rows=4000000 width=24) (actual time=25000.000..26000.000 rows=5000000 loops=1)
-   Sort Key: u.id
-   Sort Method: external merge  Disk: 512000kB
-   ->  Hash Join  (cost=50000.00..2000000.00 rows=4000000 width=24) (actual time=500.000..20000.000 rows=5000000 loops=1)
-         Hash Cond: (f2.friend_id = uf.id)
-         ->  Hash Join  (cost=30000.00..1200000.00 rows=4000000 width=16) (actual time=400.000..15000.000 rows=5000000 loops=1)
-               Hash Cond: (f2.user_id = f1.friend_id)
-               ->  Seq Scan on friends f2  (cost=0.00..500000.00 rows=1000000 width=8) (actual time=0.010..2000.000 rows=1000000 loops=1)
-               ->  Hash  (cost=20000.00..20000.00 rows=1000000 width=16) (actual time=300.000..300.000 rows=1000000 loops=1)
-                     ->  Hash Join  (cost=5000.00..20000.00 rows=1000000 width=16) (actual time=100.000..250.000 rows=1000000 loops=1)
-                           Hash Cond: (f1.user_id = u.id)
-                           ->  Seq Scan on friends f1  (cost=0.00..10000.00 rows=1000000 width=8) (actual time=0.010..50.000 rows=1000000 loops=1)
-                           ->  Hash  (cost=3000.00..3000.00 rows=100000 width=20) (actual time=50.000..50.000 rows=100000 loops=1)
-                                 ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=20) (actual time=0.010..30.000 rows=100000 loops=1)
-         ->  Hash  (cost=10000.00..10000.00 rows=100000 width=8) (actual time=50.000..50.000 rows=100000 loops=1)
-               ->  Seq Scan on users_profile uf  (cost=0.00..3000.00 rows=100000 width=8) (actual time=0.010..25.000 rows=100000 loops=1)
- Planning Time: 3.000 ms
- Execution Time: 26500.000 ms`,
-  },
-  // ── User example: Time-series self-join ──
-  {
-    title: '#7 — Time-series self-join (consecutive readings)',
-    sql: 'SELECT a.metric_name, a.recorded_at AS current_ts, a.value AS current_value, b.recorded_at AS previous_ts, b.value AS previous_value, (a.value - b.value) / NULLIF(b.value, 0) * 100 AS pct_change FROM metrics a JOIN metrics b ON b.metric_name = a.metric_name AND b.recorded_at = (SELECT max(recorded_at) FROM metrics WHERE metric_name = a.metric_name AND recorded_at < a.recorded_at) ORDER BY a.metric_name, a.recorded_at;',
-    plan: ` Sort  (cost=8000000.00..8500000.00 rows=10000000 width=32) (actual time=60000.000..65000.000 rows=10000000 loops=1)
-   Sort Key: a.metric_name, a.recorded_at
-   Sort Method: external merge  Disk: 1024000kB
-   ->  Merge Join  (cost=2000000.00..5000000.00 rows=10000000 width=32) (actual time=15000.000..45000.000 rows=10000000 loops=1)
-         Merge Cond: ((a.metric_name = b.metric_name) AND (a.recorded_at = b.recorded_at))
-         ->  Index Scan using idx_metrics_name_time on metrics a  (cost=0.50..2000000.00 rows=10000000 width=24) (actual time=0.010..15000.000 rows=10000000 loops=1)
-         ->  Materialize  (cost=1000000.00..2000000.00 rows=10000000 width=16) (actual time=8000.000..25000.000 rows=10000000 loops=1)
-               ->  Seq Scan on metrics b  (cost=0.00..1500000.00 rows=10000000 width=16) (actual time=0.010..5000.000 rows=10000000 loops=1)
-                     SubPlan 1
-                       ->  Aggregate  (cost=10.00..10.01 rows=1 width=8) (actual time=0.020..0.020 rows=1 loops=10000000)
-                             ->  Seq Scan on metrics  (cost=0.00..10.00 rows=10 width=8) (actual time=0.010..0.015 rows=10 loops=10000000)
-                                   Filter: ((metric_name = a.metric_name) AND (recorded_at < a.recorded_at))
-                                   Rows Removed by Filter: 9999990
- Planning Time: 5.000 ms
- Execution Time: 65500.000 ms`,
-  },
-  // ── User example: INNER JOIN ──
-  {
-    title: '#8 — INNER JOIN (users with their posts)',
-    sql: 'SELECT u.name, p.content, p.created_at FROM users_profile u JOIN posts p ON p.fk_user_id = u.id;',
-    plan: ` Hash Join  (cost=5000.00..350000.00 rows=500000 width=36) (actual time=50.000..3000.000 rows=500000 loops=1)
-   Hash Cond: (p.fk_user_id = u.id)
-   ->  Seq Scan on posts p  (cost=0.00..250000.00 rows=500000 width=28) (actual time=0.010..800.000 rows=500000 loops=1)
-   ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
-         ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
- Planning Time: 0.300 ms
- Execution Time: 3050.000 ms`,
-  },
-  // ── User example: LEFT JOIN ──
-  {
-    title: '#9 — LEFT JOIN (all users with or without posts)',
-    sql: 'SELECT u.name, p.id AS post_id, p.content FROM users_profile u LEFT JOIN posts p ON p.fk_user_id = u.id ORDER BY u.name;',
-    plan: ` Sort  (cost=360000.00..370000.00 rows=500000 width=28) (actual time=3500.000..3600.000 rows=500000 loops=1)
-   Sort Key: u.name
-   Sort Method: quicksort  Memory: 51200kB
-   ->  Hash Left Join  (cost=5000.00..200000.00 rows=500000 width=28) (actual time=50.000..2500.000 rows=500000 loops=1)
-         Hash Cond: (p.fk_user_id = u.id)
-         ->  Seq Scan on posts p  (cost=0.00..150000.00 rows=500000 width=20) (actual time=0.010..600.000 rows=500000 loops=1)
-         ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
-               ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
- Planning Time: 0.400 ms
- Execution Time: 3650.000 ms`,
-  },
-  // ── User example: RIGHT JOIN ──
-  {
-    title: '#10 — RIGHT JOIN (posts and commenters)',
-    sql: 'SELECT p.id AS post_id, u.name AS commenter, c.content FROM comments c RIGHT JOIN posts p ON p.id = c.fk_post_id LEFT JOIN users_profile u ON u.id = c.fk_user_id;',
-    plan: ` Hash Right Join  (cost=10000.00..700000.00 rows=2000000 width=36) (actual time=100.000..5000.000 rows=2000000 loops=1)
-   Hash Cond: (c.fk_post_id = p.id)
-   ->  Hash Left Join  (cost=5000.00..400000.00 rows=2000000 width=24) (actual time=50.000..3000.000 rows=2000000 loops=1)
-         Hash Cond: (c.fk_user_id = u.id)
-         ->  Seq Scan on comments c  (cost=0.00..100000.00 rows=2000000 width=16) (actual time=0.010..500.000 rows=2000000 loops=1)
-         ->  Hash  (cost=3000.00..3000.00 rows=100000 width=12) (actual time=40.000..40.000 rows=100000 loops=1)
-               ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
-   ->  Hash  (cost=3000.00..3000.00 rows=500000 width=16) (actual time=40.000..40.000 rows=500000 loops=1)
-         ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=16) (actual time=0.010..20.000 rows=500000 loops=1)
- Planning Time: 0.600 ms
- Execution Time: 5100.000 ms`,
-  },
-  // ── User example: FULL OUTER JOIN ──
-  {
-    title: '#11 — FULL OUTER JOIN (bidirectional friendships)',
-    sql: 'SELECT COALESCE(f1.user_id, f2.friend_id) AS user_id, COALESCE(f1.friend_id, f2.user_id) AS friend_id FROM friends f1 FULL OUTER JOIN friends f2 ON f2.user_id = f1.friend_id AND f2.friend_id = f1.user_id WHERE f1.user_id IS NULL OR f2.user_id IS NULL;',
-    plan: ` Hash Full Join  (cost=50000.00..200000.00 rows=2000000 width=8) (actual time=500.000..3000.000 rows=1000000 loops=1)
-   Hash Cond: ((f1.friend_id = f2.user_id) AND (f1.user_id = f2.friend_id))
-   Filter: ((f1.user_id IS NULL) OR (f2.user_id IS NULL))
-   Rows Removed by Filter: 500000
-   ->  Seq Scan on friends f1  (cost=0.00..50000.00 rows=1000000 width=8) (actual time=0.010..500.000 rows=1000000 loops=1)
-   ->  Hash  (cost=30000.00..30000.00 rows=1000000 width=8) (actual time=300.000..300.000 rows=1000000 loops=1)
-         ->  Seq Scan on friends f2  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..200.000 rows=1000000 loops=1)
- Planning Time: 0.800 ms
- Execution Time: 3050.000 ms`,
-  },
-  // ── User example: SELF JOIN (mutual friends) ──
-  {
-    title: '#12 — SELF JOIN (mutual friend recommendations)',
-    sql: "SELECT f1.user_id AS user_a, f2.friend_id AS suggested_friend, count(*) AS mutual_count FROM friends f1 JOIN friends f2 ON f2.user_id = f1.friend_id WHERE f2.friend_id <> f1.user_id AND (f1.user_id, f2.friend_id) NOT IN (SELECT user_id, friend_id FROM friends) GROUP BY f1.user_id, f2.friend_id ORDER BY mutual_count DESC;",
-    plan: ` Sort  (cost=5000000.00..5500000.00 rows=5000000 width=12) (actual time=40000.000..45000.000 rows=8000000 loops=1)
-   Sort Key: (count(*)) DESC
-   Sort Method: external merge  Disk: 512000kB
-   ->  HashAggregate  (cost=2000000.00..2500000.00 rows=5000000 width=12) (actual time=15000.000..25000.000 rows=8000000 loops=1)
-         Group Key: f1.user_id, f2.friend_id
-         Batches: 1  Memory Usage: 262144kB
-         ->  Hash Anti Join  (cost=500000.00..1500000.00 rows=5000000 width=8) (actual time=5000.000..12000.000 rows=8000000 loops=1)
-               Hash Cond: ((f1.user_id = friends.user_id) AND (f2.friend_id = friends.friend_id))
-               ->  Hash Join  (cost=5000.00..500000.00 rows=5000000 width=8) (actual time=100.000..5000.000 rows=8000000 loops=1)
-                     Hash Cond: (f2.user_id = f1.friend_id)
-                     ->  Seq Scan on friends f2  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..200.000 rows=1000000 loops=1)
-                     ->  Hash  (cost=3000.00..3000.00 rows=1000000 width=8) (actual time=50.000..50.000 rows=1000000 loops=1)
-                           ->  Seq Scan on friends f1  (cost=0.00..3000.00 rows=1000000 width=8) (actual time=0.010..30.000 rows=1000000 loops=1)
-               ->  Hash  (cost=300000.00..300000.00 rows=1000000 width=8) (actual time=2000.000..2000.000 rows=1000000 loops=1)
-                     ->  Seq Scan on friends  (cost=0.00..30000.00 rows=1000000 width=8) (actual time=0.010..500.000 rows=1000000 loops=1)
- Planning Time: 4.000 ms
- Execution Time: 46000.000 ms`,
-  },
-  // ── User example: CROSS JOIN ──
-  {
-    title: '#13 — CROSS JOIN (analytics grid)',
-    sql: "SELECT u.id AS user_id, e_types.event_type, count(e.id) AS event_count FROM users_profile u CROSS JOIN (SELECT DISTINCT event_type FROM events) e_types LEFT JOIN events e ON e.user_id = u.id AND e.event_type = e_types.event_type GROUP BY u.id, e_types.event_type ORDER BY u.id, e_types.event_type;",
-    plan: ` Sort  (cost=800000.00..900000.00 rows=1500000 width=12) (actual time=6000.000..6500.000 rows=1500000 loops=1)
-   Sort Key: u.id, e_types.event_type
-   Sort Method: quicksort  Memory: 102400kB
-   ->  HashAggregate  (cost=500000.00..600000.00 rows=1500000 width=12) (actual time=3000.000..4500.000 rows=1500000 loops=1)
-         Group Key: u.id, e_types.event_type
-         Batches: 1  Memory Usage: 102401kB
-         ->  Hash Right Join  (cost=50000.00..300000.00 rows=1500000 width=8) (actual time=500.000..2500.000 rows=1500000 loops=1)
-               Hash Cond: ((e.user_id = u.id) AND (e.event_type = e_types.event_type))
-               ->  Seq Scan on events e  (cost=0.00..100000.00 rows=500000 width=8) (actual time=0.010..300.000 rows=500000 loops=1)
-               ->  Hash  (cost=40000.00..40000.00 rows=1500000 width=8) (actual time=400.000..400.000 rows=1500000 loops=1)
-                     ->  Nested Loop  (cost=5000.00..40000.00 rows=1500000 width=8) (actual time=100.000..350.000 rows=1500000 loops=1)
-                           ->  HashAggregate  (cost=5000.00..5005.00 rows=15 width=8) (actual time=100.000..100.050 rows=15 loops=1)
-                                 Group Key: events.event_type
-                                 ->  Seq Scan on events  (cost=0.00..4500.00 rows=500000 width=8) (actual time=0.010..50.000 rows=500000 loops=1)
-                           ->  Seq Scan on users_profile u  (cost=0.00..2000.00 rows=100000 width=4) (actual time=0.010..1.000 rows=100000 loops=1)
- Planning Time: 1.500 ms
- Execution Time: 6600.000 ms`,
-  },
-  // ── User example: Semi-join via EXISTS ──
-  {
-    title: '#14 — Semi-join via EXISTS (users who commented)',
-    sql: 'SELECT u.id, u.name, u.email FROM users_profile u WHERE EXISTS (SELECT 1 FROM comments c WHERE c.fk_user_id = u.id);',
-    plan: ` Hash Semi Join  (cost=5000.00..150000.00 rows=80000 width=28) (actual time=50.000..2000.000 rows=80000 loops=1)
-   Hash Cond: (u.id = c.fk_user_id)
-   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=28) (actual time=0.010..20.000 rows=100000 loops=1)
-   ->  Hash  (cost=4000.00..4000.00 rows=2000000 width=4) (actual time=40.000..40.000 rows=2000000 loops=1)
-         ->  Seq Scan on comments c  (cost=0.00..4000.00 rows=2000000 width=4) (actual time=0.010..20.000 rows=2000000 loops=1)
- Planning Time: 0.250 ms
- Execution Time: 2050.000 ms`,
-  },
-  // ── User example: Anti-join via NOT EXISTS ──
-  {
-    title: '#15 — Anti-join via NOT EXISTS (users who never posted)',
-    sql: 'SELECT u.id, u.name, u.email FROM users_profile u WHERE NOT EXISTS (SELECT 1 FROM posts p WHERE p.fk_user_id = u.id);',
-    plan: ` Hash Anti Join  (cost=5000.00..120000.00 rows=20000 width=28) (actual time=50.000..1000.000 rows=20000 loops=1)
-   Hash Cond: (u.id = p.fk_user_id)
-   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=28) (actual time=0.010..20.000 rows=100000 loops=1)
-   ->  Hash  (cost=3000.00..3000.00 rows=500000 width=4) (actual time=20.000..20.000 rows=500000 loops=1)
-         ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=4) (actual time=0.010..10.000 rows=500000 loops=1)
- Planning Time: 0.200 ms
- Execution Time: 1050.000 ms`,
-  },
-  // ── User example: LATERAL join ──
-  {
-    title: '#16 — LATERAL join (top 3 comments per post)',
-    sql: 'SELECT p.id AS post_id, c.id AS comment_id, c.content AS comment_text, u.name AS commenter FROM posts p CROSS JOIN LATERAL (SELECT id, content, fk_user_id FROM comments WHERE fk_post_id = p.id ORDER BY created_at DESC LIMIT 3) c JOIN users_profile u ON u.id = c.fk_user_id ORDER BY p.id, c.id;',
-    plan: ` Nested Loop  (cost=5000.00..2000000.00 rows=1500000 width=48) (actual time=100.000..15000.000 rows=1500000 loops=1)
-   Join Filter: (u.id = c.fk_user_id)
-   ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
-   ->  Materialize  (cost=5000.00..1000000.00 rows=1500000 width=24) (actual time=0.010..0.050 rows=1500000 loops=1)
-         ->  Nested Loop  (cost=5000.00..500000.00 rows=1500000 width=24) (actual time=100.000..10000.000 rows=1500000 loops=1)
-               ->  Seq Scan on posts p  (cost=0.00..3000.00 rows=500000 width=4) (actual time=0.010..10.000 rows=500000 loops=1)
-               ->  Limit  (cost=1.00..1.50 rows=3 width=20) (actual time=0.020..0.020 rows=3 loops=500000)
-                     ->  Sort  (cost=1.00..1.50 rows=3 width=20) (actual time=0.020..0.020 rows=3 loops=500000)
-                           Sort Key: comments.created_at DESC
-                           Sort Method: quicksort  Memory: 25kB
-                           ->  Seq Scan on comments  (cost=0.00..1.00 rows=3 width=20) (actual time=0.010..0.010 rows=3 loops=500000)
-                                 Filter: (fk_post_id = p.id)
-                                 Rows Removed by Filter: 1999997
- Planning Time: 2.000 ms
- Execution Time: 15500.000 ms`,
-  },
-  // ── User example: Multi-way join with aggregation ──
-  {
-    title: '#17 — Multi-way join with aggregation (user engagement)',
-    sql: 'SELECT u.id, u.name, count(DISTINCT p.id) AS total_posts, count(DISTINCT c.id) AS total_comments_received, count(DISTINCT fr.user_id) AS friend_count FROM users_profile u LEFT JOIN posts p ON p.fk_user_id = u.id LEFT JOIN comments c ON c.fk_post_id = p.id LEFT JOIN friends fr ON fr.friend_id = u.id GROUP BY u.id, u.name ORDER BY total_posts DESC;',
-    plan: ` Sort  (cost=3000000.00..3100000.00 rows=100000 width=16) (actual time=20000.000..20500.000 rows=100000 loops=1)
-   Sort Key: (count(DISTINCT p.id)) DESC
-   Sort Method: quicksort  Memory: 10240kB
-   ->  GroupAggregate  (cost=2000000.00..2900000.00 rows=100000 width=16) (actual time=10000.000..18000.000 rows=100000 loops=1)
-         Group Key: u.id, u.name
-         ->  Sort  (cost=2000000.00..2200000.00 rows=4000000 width=16) (actual time=10000.000..12000.000 rows=4000000 loops=1)
-               Sort Key: u.id, u.name
-               Sort Method: external merge  Disk: 256000kB
-               ->  Hash Left Join  (cost=100000.00..1000000.00 rows=4000000 width=16) (actual time=1000.000..8000.000 rows=4000000 loops=1)
-                     Hash Cond: (p.fk_user_id = u.id)
-                     ->  Hash Left Join  (cost=50000.00..500000.00 rows=2000000 width=12) (actual time=500.000..4000.000 rows=2000000 loops=1)
-                           Hash Cond: (p.id = c.fk_post_id)
-                           ->  Hash Left Join  (cost=25000.00..250000.00 rows=500000 width=8) (actual time=300.000..2000.000 rows=500000 loops=1)
-                                 Hash Cond: (u.id = fr.friend_id)
-                                 ->  Seq Scan on users_profile u  (cost=0.00..3000.00 rows=100000 width=12) (actual time=0.010..20.000 rows=100000 loops=1)
-                                 ->  Hash  (cost=15000.00..15000.00 rows=1000000 width=4) (actual time=200.000..200.000 rows=1000000 loops=1)
-                                       ->  Seq Scan on friends fr  (cost=0.00..15000.00 rows=1000000 width=4) (actual time=0.010..100.000 rows=1000000 loops=1)
-                           ->  Hash  (cost=15000.00..15000.00 rows=2000000 width=8) (actual time=150.000..150.000 rows=2000000 loops=1)
-                                 ->  Seq Scan on comments c  (cost=0.00..10000.00 rows=2000000 width=8) (actual time=0.010..80.000 rows=2000000 loops=1)
-                     ->  Hash  (cost=30000.00..30000.00 rows=500000 width=4) (actual time=300.000..300.000 rows=500000 loops=1)
-                           ->  Seq Scan on posts p  (cost=0.00..25000.00 rows=500000 width=4) (actual time=0.010..150.000 rows=500000 loops=1)
- Planning Time: 5.000 ms
- Execution Time: 21000.000 ms`,
-  },
-];
-
+// ── Build tabs ──
+const categories = ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
+const tabsEl = document.getElementById('tabs');
 const container = document.getElementById('examples');
+let activeCategory = 'SELECT';
 
-for (const ex of examples) {
-  const card = document.createElement('div');
-  card.className = 'plan-card';
-
-  const planText = ex.format === 'json' ? JSON.stringify(ex.plan) : ex.plan;
-  const rawText = ex.format === 'json' ? JSON.stringify(ex.plan, null, 2) : ex.plan;
-
-  card.innerHTML = `
-    <div class="plan-card-header">
-      <h2>${ex.title}</h2>
-      <code class="sql">${ex.sql}</code>
-    </div>
-    <div class="plan-card-body">
-      <div class="mermaid">pg-plan
+function renderCards(category) {
+  container.innerHTML = '';
+  const filtered = category === 'ALL' ? examples : examples.filter(e => e.category === category);
+  for (const [idx, ex] of filtered.entries()) {
+    const card = document.createElement('div');
+    card.className = 'plan-card';
+    const slug = ex.title.replace(/[^a-zA-Z0-9\u2014]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+    card.id = `card-${slug}`;
+    const planText = ex.format === 'json' ? JSON.stringify(ex.plan) : ex.plan;
+    const rawText = ex.format === 'json' ? JSON.stringify(ex.plan, null, 2) : ex.plan;
+    card.innerHTML = `
+      <div class="plan-card-header">
+        <h2>${ex.title}</h2>
+        <code class="sql">${ex.sql}</code>
+      </div>
+      <div class="plan-card-body">
+        <div class="mermaid">pg-plan
 ${planText}</div>
-    </div>
-    <details class="plan-card-raw">
-      <summary>View raw EXPLAIN output</summary>
-      <pre>${rawText}</pre>
-    </details>
-    <details class="plan-card-raw">
-      <summary>View Mermaid source</summary>
-      <pre>pg-plan
+      </div>
+      <details class="plan-card-raw">
+        <summary>View raw EXPLAIN output</summary>
+        <pre>${rawText}</pre>
+      </details>
+      <details class="plan-card-raw">
+        <summary>View Mermaid source</summary>
+        <pre>pg-plan
 ${planText}</pre>
-    </details>
-  `;
-
-  container.appendChild(card);
+      </details>
+    `;
+    container.appendChild(card);
+  }
+  mermaid.run({ querySelector: '.mermaid' });
 }
 
-// Render all mermaid diagrams
-await mermaid.run({ querySelector: '.mermaid' });
+function buildTabs() {
+  for (const cat of categories) {
+    const count = examples.filter(e => e.category === cat).length;
+    const btn = document.createElement('button');
+    btn.dataset.cat = cat;
+    btn.innerHTML = `${cat} <span class="count">${count}</span>`;
+    if (cat === activeCategory) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = cat;
+      renderCards(cat);
+      if (panelOpen) buildPanel(cat);
+    });
+    tabsEl.appendChild(btn);
+  }
+}
+
+// ── Side panel ──
+const panelToggle = document.getElementById('panelToggle');
+const panelOverlay = document.getElementById('panelOverlay');
+const slidePanel = document.getElementById('slidePanel');
+const panelBody = document.getElementById('panelBody');
+const panelCount = document.getElementById('panelCount');
+const panelClose = document.getElementById('panelClose');
+let panelOpen = false;
+
+function togglePanel(open) {
+  panelOpen = open;
+  panelToggle.classList.toggle('open', open);
+  slidePanel.classList.toggle('open', open);
+  panelOverlay.classList.toggle('open', open);
+}
+
+function buildPanel(category) {
+  const filtered = examples.filter(e => e.category === category);
+  panelCount.textContent = `(${filtered.length})`;
+  let html = '';
+  for (const ex of filtered) {
+    const slug = ex.title.replace(/[^a-zA-Z0-9\u2014]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+    const catColor = { SELECT: '#4CAF50', INSERT: '#2196F3', UPDATE: '#FF9800', DELETE: '#f44336' };
+    const color = catColor[ex.category] || '#999';
+    html += `<button class="slide-panel-item" data-slug="${slug}">
+      <span class="cat" style="background:${color}">${ex.category}</span>
+      <span class="n">${ex.title}</span>
+    </button>`;
+  }
+  panelBody.innerHTML = html;
+
+  panelBody.querySelectorAll('.slide-panel-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slug = btn.dataset.slug;
+      const el = document.getElementById(`card-${slug}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        togglePanel(false);
+      }
+    });
+  });
+}
+
+panelToggle.addEventListener('click', () => togglePanel(!panelOpen));
+panelClose.addEventListener('click', () => togglePanel(false));
+panelOverlay.addEventListener('click', () => togglePanel(false));
+
+// ── Build legend ──
+function buildLegend(isDark) {
+  const el = document.getElementById('legend');
+  const catColors = {};
+  for (const c of CATEGORIES) catColors[c.cat] = isDark ? c.colorDark : c.color;
+
+  let html = '<h3>Node types</h3><div class="legend-table">';
+  for (const nt of NODE_TYPES) {
+    const color = catColors[nt.cat] || '#999';
+    html += `<div class="legend-item">
+      <span class="legend-swatch" style="background:${color}"></span>
+      <span class="legend-cat" style="background:${color}">${nt.cat}</span>
+      <span class="legend-type">${nt.type}</span>
+      <span class="legend-desc">— ${nt.desc}</span>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+buildLegend(false);
+buildPanel('SELECT');
+renderCards('SELECT');
+
+// ── Dark/light toggle ──
+const toggle = document.getElementById('themeToggle');
+const icon = document.getElementById('themeIcon');
+const label = document.getElementById('themeLabel');
+let isDark = false;
+
+toggle.addEventListener('click', () => {
+  isDark = !isDark;
+  document.documentElement.classList.toggle('dark', isDark);
+  icon.textContent = isDark ? '\u{1F319}' : '\u2600\uFE0F';
+  label.textContent = isDark ? 'Dark' : 'Light';
+  buildLegend(isDark);
+  if (panelOpen) buildPanel(activeCategory);
+  renderCards(activeCategory);
+});
 </script>
 </body>
 </html>
