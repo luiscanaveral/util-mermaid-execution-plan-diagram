@@ -52,6 +52,35 @@ function getColor(type, isDark) {
   return palette.scan;
 }
 
+const ICON_PATHS = {
+  scan: 'M-4,-4h8v8h-8zM-4,0h8M0,-4v8',
+  join: 'M-5,0a5,5 0 1,0 10,0a5,5 0 1,0-10,0M-3,0h6M0,-3v6',
+  aggregate: 'M-4,-4l8,0-4,8z',
+  modify: 'M-3,-4l6,2-2,5-6-2z',
+  other: 'M-4,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0-3,0M0,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0-3,0M4,0a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0-3,0',
+};
+
+function renderNodeIcon(g, x, y, cat, color) {
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', ICON_PATHS[cat] || ICON_PATHS.other);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '1.3');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-linejoin', 'round');
+  path.setAttribute('transform', `translate(${x + 10},${y})`);
+  g.appendChild(path);
+}
+
+function getNodeCat(type) {
+  const lower = type.toLowerCase();
+  if (/scan/i.test(lower)) return 'scan';
+  if (/join|nested loop|hash|merge/i.test(lower) && !/scan/i.test(lower)) return 'join';
+  if (/sort|aggregate|group/i.test(lower)) return 'aggregate';
+  if (/insert|update|delete|modify/i.test(lower)) return 'modify';
+  return 'other';
+}
+
 function getNodeHeight(node) {
   let h = HEADER_H + PAD;
   if (node.relation) h += LINE_H;
@@ -164,6 +193,7 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
   badge.setAttribute('r', 7);
   badge.setAttribute('fill', 'rgba(255,255,255,0.3)');
   g.appendChild(badge);
+  renderNodeIcon(g, x + 8, y + HEADER_H / 2, getNodeCat(node.type), 'rgba(255,255,255,0.9)');
 
   // Node type text
   const typeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -181,23 +211,19 @@ function renderNodeSVG(svg, layoutItem, color, isDark) {
   let ly = y + HEADER_H + PAD;
 
   if (node.relation) {
+    const iconX = x + PAD;
+    const iconY = ly + LINE_H / 2;
+    renderNodeIcon(g, iconX, iconY, getNodeCat(node.type), mutedColor);
+
     const relText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    relText.setAttribute('x', x + PAD);
-    relText.setAttribute('y', ly + LINE_H / 2);
+    relText.setAttribute('x', x + PAD + 22);
+    relText.setAttribute('y', iconY);
     relText.setAttribute('fill', textColor);
     relText.setAttribute('font-family', FONT_FAMILY);
     relText.setAttribute('font-size', '13');
     relText.setAttribute('font-weight', '600');
     relText.setAttribute('dominant-baseline', 'middle');
-
-    const iconSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    iconSpan.setAttribute('fill', mutedColor);
-    const isScan = /scan/i.test(node.type);
-    iconSpan.textContent = isScan ? '\u229E ' : '\u25B6 ';
-    relText.appendChild(iconSpan);
-    const nameSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    nameSpan.textContent = node.relation;
-    relText.appendChild(nameSpan);
+    relText.textContent = node.relation;
     g.appendChild(relText);
     ly += LINE_H;
   }

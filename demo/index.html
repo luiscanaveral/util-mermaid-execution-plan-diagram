@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PostgreSQL Execution Plan Diagram — Mermaid Plugin Demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css" id="hljsTheme">
 <style>
   :root {
     --bg: #f8f9fa;
@@ -196,22 +197,41 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-  .legend-table {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 4px 20px;
+  .legend-columns {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+  }
+  .legend-col {
+    min-width: 180px;
+    flex: 1;
+  }
+  .legend-col h4 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #fff;
+    margin-bottom: 6px;
+    display: inline-block;
+  }
+  .legend-col-items {
+    display: flex;
+    flex-direction: column;
   }
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 3px 0;
-    font-size: 12px;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 11px;
     color: var(--text);
   }
   .legend-swatch {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 3px;
     flex-shrink: 0;
   }
@@ -223,21 +243,10 @@
   }
   .legend-desc {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  .legend-cat {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 1px 6px;
-    border-radius: 3px;
-    color: #fff;
-    margin-right: 4px;
-    flex-shrink: 0;
   }
   .footer {
     text-align: center;
@@ -342,17 +351,16 @@
     color: var(--text);
     font-weight: 400;
   }
-  .slide-panel-item .cat {
-    display: inline-block;
-    font-size: 9px;
-    font-weight: 600;
+  .slide-panel-group { margin-bottom: 4px; }
+  .slide-panel-group-header {
+    font-size: 10px;
+    font-weight: 700;
     text-transform: uppercase;
-    padding: 1px 5px;
-    border-radius: 3px;
-    margin-right: 6px;
+    letter-spacing: 0.05em;
+    padding: 5px 16px;
     color: #fff;
-    vertical-align: middle;
   }
+
   .slide-panel-overlay {
     position: fixed;
     inset: 0;
@@ -404,6 +412,7 @@
   Source: <code>src/</code>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/common.min.js"></script>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 import { pgPlanDiagram } from '../src/index.js';
@@ -442,7 +451,7 @@ function renderCards(category) {
     card.innerHTML = `
       <div class="plan-card-header">
         <h2>${ex.title}</h2>
-        <code class="sql">${ex.sql}</code>
+        <code class="sql language-sql">${ex.sql}</code>
       </div>
       <div class="plan-card-body">
         <div class="mermaid">pg-plan
@@ -461,6 +470,11 @@ ${planText}</pre>
     container.appendChild(card);
   }
   mermaid.run({ querySelector: '.mermaid' });
+  hljsHighlight();
+}
+
+function hljsHighlight() {
+  document.querySelectorAll('.sql').forEach(el => hljs.highlightElement(el));
 }
 
 function buildTabs() {
@@ -475,7 +489,7 @@ function buildTabs() {
       btn.classList.add('active');
       activeCategory = cat;
       renderCards(cat);
-      if (panelOpen) buildPanel(cat);
+      if (panelOpen) buildPanel();
     });
     tabsEl.appendChild(btn);
   }
@@ -497,29 +511,48 @@ function togglePanel(open) {
   panelOverlay.classList.toggle('open', open);
 }
 
-function buildPanel(category) {
-  const filtered = examples.filter(e => e.category === category);
-  panelCount.textContent = `(${filtered.length})`;
+function buildPanel() {
+  const catColor = { SELECT: '#4CAF50', INSERT: '#2196F3', UPDATE: '#FF9800', DELETE: '#f44336' };
+  const cats = ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
+  const total = examples.length;
+  panelCount.textContent = `(${total})`;
   let html = '';
-  for (const ex of filtered) {
-    const slug = ex.title.replace(/[^a-zA-Z0-9\u2014]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
-    const catColor = { SELECT: '#4CAF50', INSERT: '#2196F3', UPDATE: '#FF9800', DELETE: '#f44336' };
-    const color = catColor[ex.category] || '#999';
-    html += `<button class="slide-panel-item" data-slug="${slug}">
-      <span class="cat" style="background:${color}">${ex.category}</span>
-      <span class="n">${ex.title}</span>
-    </button>`;
+  for (const c of cats) {
+    const items = examples.filter(e => e.category === c);
+    if (items.length === 0) continue;
+    const color = catColor[c];
+    html += `<div class="slide-panel-group">
+      <div class="slide-panel-group-header" style="background:${color}">${c} (${items.length})</div>`;
+    for (const ex of items) {
+      const slug = ex.title.replace(/[^a-zA-Z0-9\u2014]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+      html += `<button class="slide-panel-item" data-slug="${slug}" data-cat="${ex.category}">
+        <span class="n">${ex.title}</span>
+      </button>`;
+    }
+    html += '</div>';
   }
   panelBody.innerHTML = html;
 
   panelBody.querySelectorAll('.slide-panel-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const slug = btn.dataset.slug;
-      const el = document.getElementById(`card-${slug}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        togglePanel(false);
+      const cat = btn.dataset.cat;
+      function scrollToCard() {
+        const el = document.getElementById(`card-${slug}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          togglePanel(false);
+        }
       }
+      if (cat && cat !== activeCategory) {
+        const tabBtn = document.querySelector(`.tabs button[data-cat="${cat}"]`);
+        if (tabBtn) {
+          tabBtn.click();
+          requestAnimationFrame(scrollToCard);
+          return;
+        }
+      }
+      scrollToCard();
     });
   });
 }
@@ -534,22 +567,28 @@ function buildLegend(isDark) {
   const catColors = {};
   for (const c of CATEGORIES) catColors[c.cat] = isDark ? c.colorDark : c.color;
 
-  let html = '<h3>Node types</h3><div class="legend-table">';
-  for (const nt of NODE_TYPES) {
-    const color = catColors[nt.cat] || '#999';
-    html += `<div class="legend-item">
-      <span class="legend-swatch" style="background:${color}"></span>
-      <span class="legend-cat" style="background:${color}">${nt.cat}</span>
-      <span class="legend-type">${nt.type}</span>
-      <span class="legend-desc">— ${nt.desc}</span>
-    </div>`;
+  let html = '<h3>Node types</h3><div class="legend-columns">';
+  for (const c of CATEGORIES) {
+    const color = catColors[c.cat];
+    const items = NODE_TYPES.filter(nt => nt.cat === c.cat);
+    html += `<div class="legend-col">
+      <h4 style="background:${color}">${c.label} (${items.length})</h4>
+      <div class="legend-col-items">`;
+    for (const nt of items) {
+      html += `<div class="legend-item">
+        <span class="legend-swatch" style="background:${color}"></span>
+        <span class="legend-type">${nt.type}</span>
+        <span class="legend-desc">— ${nt.desc}</span>
+      </div>`;
+    }
+    html += '</div></div>';
   }
   html += '</div>';
   el.innerHTML = html;
 }
 
 buildLegend(false);
-buildPanel('SELECT');
+buildPanel();
 renderCards('SELECT');
 
 // ── Dark/light toggle ──
@@ -561,10 +600,13 @@ let isDark = false;
 toggle.addEventListener('click', () => {
   isDark = !isDark;
   document.documentElement.classList.toggle('dark', isDark);
+  document.getElementById('hljsTheme').href = isDark
+    ? 'https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css'
+    : 'https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css';
   icon.textContent = isDark ? '\u{1F319}' : '\u2600\uFE0F';
   label.textContent = isDark ? 'Dark' : 'Light';
   buildLegend(isDark);
-  if (panelOpen) buildPanel(activeCategory);
+  if (panelOpen) buildPanel();
   renderCards(activeCategory);
 });
 </script>

@@ -51,8 +51,8 @@ export const NODE_TYPES = [
 
 export const CATEGORIES = [
   { cat: 'scan',      label: 'Scan',      color: '#4CAF50', colorDark: '#40a02b', icon: '\u229E' },
-  { cat: 'join',      label: 'Join',      color: '#2196F3', colorDark: '#1e66f5', icon: '\u25B6' },
-  { cat: 'aggregate', label: 'Aggregate', color: '#FF9800', colorDark: '#df8e1d', icon: '\u25B6' },
-  { cat: 'modify',    label: 'Modify',    color: '#f44336', colorDark: '#d20f39', icon: '\u25B6' },
-  { cat: 'other',     label: 'Other',     color: '#9E9E9E', colorDark: '#6c7086', icon: '\u25B6' },
+  { cat: 'join',      label: 'Join',      color: '#2196F3', colorDark: '#1e66f5', icon: '\u2A1D' },
+  { cat: 'aggregate', label: 'Aggregate', color: '#FF9800', colorDark: '#df8e1d', icon: '\u2211' },
+  { cat: 'modify',    label: 'Modify',    color: '#f44336', colorDark: '#d20f39', icon: '\u270E' },
+  { cat: 'other',     label: 'Other',     color: '#9E9E9E', colorDark: '#6c7086', icon: '\u25C7' },
 ];

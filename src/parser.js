@@ -286,6 +286,14 @@ function fmtSize(kb) {
   return n + ' KB';
 }
 
+function fmtTime(ms) {
+  if (typeof ms !== 'number' || isNaN(ms)) return String(ms);
+  const s = ms.toFixed(3);
+  // Preserve all 3 decimal places for sub-ms values (microsecond precision),
+  // strip trailing zeros for larger values
+  return ms < 1 ? s : s.replace(/\.?0+$/, '');
+}
+
 export function computeNodeNotes(node) {
   const notes = [];
 
@@ -306,9 +314,9 @@ export function computeNodeNotes(node) {
   // Execution time
   if (node.hasActuals) {
     const totalTime = node.actualTotal * node.loops;
-    let t = `Time: ${node.actualTotal} ms`;
+    let t = `Time: ${fmtTime(node.actualTotal)} ms`;
     if (node.loops > 1) {
-      t += ` (×${node.loops} = ${totalTime.toFixed(1)} ms)`;
+      t += ` (×${node.loops} = ${fmtTime(totalTime)} ms)`;
     }
     notes.push(t);
   }
