@@ -45,8 +45,8 @@ function getColor(type, isDark) {
   const palette = isDark ? NODE_COLORS_DARK : NODE_COLORS;
   const lower = type.toLowerCase();
   if (/scan/i.test(lower)) return palette.scan;
-  if (/join|nested loop|hash|merge/i.test(lower) && !/scan/i.test(lower)) return palette.join;
   if (/sort|aggregate|group/i.test(lower)) return palette.aggregate;
+  if (/join|nested loop|hash|merge/i.test(lower) && !/scan/i.test(lower)) return palette.join;
   if (/insert|update|delete|modify/i.test(lower)) return palette.modify;
   if (/limit|subquery|append|result|unique|materialize|setop/i.test(lower)) return palette.other;
   return palette.scan;
@@ -75,8 +75,8 @@ function renderNodeIcon(g, x, y, cat, color) {
 function getNodeCat(type) {
   const lower = type.toLowerCase();
   if (/scan/i.test(lower)) return 'scan';
-  if (/join|nested loop|hash|merge/i.test(lower) && !/scan/i.test(lower)) return 'join';
   if (/sort|aggregate|group/i.test(lower)) return 'aggregate';
+  if (/join|nested loop|hash|merge/i.test(lower) && !/scan/i.test(lower)) return 'join';
   if (/insert|update|delete|modify/i.test(lower)) return 'modify';
   return 'other';
 }
@@ -318,12 +318,18 @@ function renderMeta(svg, meta, svgW, isDark) {
 }
 
 export function renderPlan(planData, svgId, isDark) {
-  if (!planData || !planData.root) return;
+  if (!planData || !planData.root) {
+    const svg = document.getElementById(svgId);
+    if (svg) {
+      svg.innerHTML = '<text x="20" y="30" fill="#888" font-family="monospace" font-size="12">No plan data</text>';
+    }
+    return;
+  }
 
   const svg = document.getElementById(svgId);
   if (!svg) return;
 
-  svg.innerHTML = '';
+  while (svg.lastChild) svg.removeChild(svg.lastChild);
 
   const layout = [];
   const rootNode = planData.root;
@@ -331,7 +337,12 @@ export function renderPlan(planData, svgId, isDark) {
   const startX = TREE_PAD;
   const startY = TREE_PAD + 30;
 
-  layoutTree(rootNode, startX, startY, 0, layout);
+  try {
+    layoutTree(rootNode, startX, startY, 0, layout);
+  } catch (e) {
+    svg.textContent = 'Layout error: ' + e.message;
+    return;
+  }
 
   // Calculate total dimensions
   let maxW = 0;

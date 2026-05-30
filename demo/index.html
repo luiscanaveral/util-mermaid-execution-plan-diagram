@@ -412,7 +412,7 @@
   Source: <code>src/</code>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/common.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/build/highlight.min.js"></script>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 import { pgPlanDiagram } from '../src/index.js';
@@ -438,6 +438,10 @@ const tabsEl = document.getElementById('tabs');
 const container = document.getElementById('examples');
 let activeCategory = 'SELECT';
 
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function renderCards(category) {
   container.innerHTML = '';
   const filtered = category === 'ALL' ? examples : examples.filter(e => e.category === category);
@@ -448,10 +452,12 @@ function renderCards(category) {
     card.id = `card-${slug}`;
     const planText = ex.format === 'json' ? JSON.stringify(ex.plan) : ex.plan;
     const rawText = ex.format === 'json' ? JSON.stringify(ex.plan, null, 2) : ex.plan;
+    const sqlEsc = escHtml(ex.sql);
+    const sqlTrunc = sqlEsc.length > 80 ? sqlEsc.substring(0, 80) + '\u2026' : sqlEsc;
     card.innerHTML = `
       <div class="plan-card-header">
         <h2>${ex.title}</h2>
-        <code class="sql language-sql">${ex.sql}</code>
+        <code class="sql language-sql" title="${escHtml(ex.sql)}">${sqlTrunc}</code>
       </div>
       <div class="plan-card-body">
         <div class="mermaid">pg-plan
@@ -469,12 +475,16 @@ ${planText}</pre>
     `;
     container.appendChild(card);
   }
-  mermaid.run({ querySelector: '.mermaid' });
+  mermaid.run({ querySelector: '.mermaid' }).catch(function(err) {
+    console.error('mermaid.run error:', err);
+  });
   hljsHighlight();
 }
 
 function hljsHighlight() {
-  document.querySelectorAll('.sql').forEach(el => hljs.highlightElement(el));
+  if (typeof hljs !== 'undefined') {
+    document.querySelectorAll('.sql').forEach(el => hljs.highlightElement(el));
+  }
 }
 
 function buildTabs() {
@@ -588,6 +598,7 @@ function buildLegend(isDark) {
 }
 
 buildLegend(false);
+buildTabs();
 buildPanel();
 renderCards('SELECT');
 
