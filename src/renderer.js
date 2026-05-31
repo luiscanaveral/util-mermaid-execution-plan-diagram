@@ -300,18 +300,29 @@ function renderMeta(svg, meta, svgW, isDark) {
   if (!meta || (!meta.planningTime && !meta.executionTime)) return;
 
   const textColor = isDark ? '#6c7086' : '#6b7280';
-  const y = svgW > 600 ? 20 : 10;
+  const y = 14;
   const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', svgW - 15);
+  text.setAttribute('x', 12);
   text.setAttribute('y', y);
   text.setAttribute('fill', textColor);
   text.setAttribute('font-family', FONT_FAMILY);
   text.setAttribute('font-size', '11');
-  text.setAttribute('text-anchor', 'end');
+  text.setAttribute('text-anchor', 'start');
 
   const parts = [];
+  if (meta.executionTime !== null) {
+    const ms = meta.executionTime;
+    const sec = ms / 1000;
+    let suf = `(${sec.toFixed(3)}s`;
+    if (sec >= 60) {
+      const min = Math.floor(sec / 60);
+      const remSec = Math.round(sec % 60);
+      suf += ` | ${min}:${String(remSec).padStart(2, '0')}`;
+    }
+    suf += ')';
+    parts.push(`Execution: ${ms}ms ${suf}`);
+  }
   if (meta.planningTime !== null) parts.push(`Planning: ${meta.planningTime}ms`);
-  if (meta.executionTime !== null) parts.push(`Execution: ${meta.executionTime}ms`);
   text.textContent = parts.join('  |  ');
 
   svg.appendChild(text);

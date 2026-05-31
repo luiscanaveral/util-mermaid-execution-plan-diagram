@@ -172,6 +172,46 @@
   .plan-card-body .mermaid svg {
     max-width: 100%;
   }
+  .custom-editor {
+    padding: 20px;
+  }
+  .custom-editor textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .custom-editor .row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .custom-editor button {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s;
+  }
+  .custom-editor button:hover { opacity: 0.85; }
+  .custom-editor button:active { opacity: 0.7; }
+  .custom-editor .hint {
+    font-size: 12px;
+    color: var(--muted);
+  }
   .plan-card-raw {
     border-top: 1px solid var(--border);
     padding: 16px 20px;
@@ -437,10 +477,11 @@ mermaid.initialize({
 });
 
 // ── Build tabs ──
-const categories = ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
+const categories = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CUSTOM'];
 const tabsEl = document.getElementById('tabs');
 const container = document.getElementById('examples');
 let activeCategory = 'SELECT';
+let customCards = [];
 
 function escHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -448,6 +489,18 @@ function escHtml(s) {
 
 function renderCards(category) {
   container.innerHTML = '';
+  if (category === 'CUSTOM') {
+    container.innerHTML = `<div class="custom-editor">
+      <textarea id="planInput" placeholder="Paste EXPLAIN output here (text or JSON format)…"></textarea>
+      <div class="row">
+        <button id="renderBtn">Render Diagram</button>
+        <span class="hint">Auto-detects text and JSON format</span>
+      </div>
+    </div>`;
+    for (const c of customCards) container.appendChild(c);
+    document.getElementById('renderBtn').addEventListener('click', renderCustom);
+    return;
+  }
   const filtered = category === 'ALL' ? examples : examples.filter(e => e.category === category);
   for (const [idx, ex] of filtered.entries()) {
     const card = document.createElement('div');
@@ -492,12 +545,57 @@ function hljsHighlight() {
   }
 }
 
+function renderCustom() {
+  const input = document.getElementById('planInput').value.trim();
+  if (!input) return;
+  let planText, rawText;
+  try {
+    const parsed = JSON.parse(input);
+    planText = JSON.stringify(parsed);
+    rawText = JSON.stringify(parsed, null, 2);
+  } catch {
+    planText = input;
+    rawText = input;
+  }
+  const card = document.createElement('div');
+  card.className = 'plan-card';
+  const n = customCards.length + 1;
+  card.innerHTML = `
+    <div class="plan-card-header">
+      <h2>Custom Plan #${n}</h2>
+    </div>
+    <div class="plan-card-body">
+      <div class="mermaid">pg-plan
+${planText}</div>
+    </div>
+    <details class="plan-card-raw">
+      <summary>View raw EXPLAIN output</summary>
+      <pre>${rawText}</pre>
+    </details>
+    <details class="plan-card-raw">
+      <summary>View Mermaid source</summary>
+      <pre>pg-plan
+${planText}</pre>
+    </details>
+  `;
+  customCards.push(card);
+  container.appendChild(card);
+  document.getElementById('planInput').value = '';
+  mermaid.run({ querySelector: '.mermaid' }).catch(function(err) {
+    console.error('mermaid.run error:', err);
+  });
+}
+
 function buildTabs() {
   for (const cat of categories) {
-    const count = examples.filter(e => e.category === cat).length;
     const btn = document.createElement('button');
     btn.dataset.cat = cat;
-    btn.innerHTML = `${cat} <span class="count">${count}</span>`;
+    if (cat === 'CUSTOM') {
+      btn.textContent = 'Custom';
+    } else {
+      const count = examples.filter(e => e.category === cat).length;
+      btn.innerHTML = `${cat} <span class="count">${count}</span>`;
+    }
     if (cat === activeCategory) btn.classList.add('active');
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
